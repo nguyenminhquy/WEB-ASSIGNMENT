@@ -1,0 +1,129 @@
+/* Cải thiện giao diện bảng giỏ hàng */
+.table th, .table td {
+    text-align: center;
+    padding: 12px;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+.table-bordered td, .table-bordered th {
+    border: 1px solid #ddd;
+}
+
+.table td {
+    font-size: 14px;
+}
+
+/* Nút bấm "Xác Nhận Thanh Toán" */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    font-size: 16px;
+    padding: 10px 20px;
+    width: 100%;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    cursor: pointer;
+}
+
+/* Cải thiện phần form phương thức thanh toán */
+.form-group label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+/* Tùy chỉnh phần thanh toán cho đẹp hơn */
+.payment-method-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.payment-method-container h4 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+/* Tùy chỉnh phần thông tin giỏ hàng */
+.cart-info-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Tạo không gian cho phần footer */
+footer {
+    padding: 30px 0;
+    background-color: #333;
+    color: #fff;
+}
+
+footer a {
+    color: #fff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #28a745;
+}
+
+#error_message {
+    display: none; /* Mặc định ẩn */
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 80%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Làm tròn góc cho alert */
+.alert {
+    border-radius: 10px;
+    font-size: 16px;
+}
+/* Thêm hiệu ứng hover cho các hàng trong bảng */
+.table-hover tbody tr:hover {
+    background-color: #f2f2f2;
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Thêm bóng đổ nhẹ cho bảng */
+.table {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}

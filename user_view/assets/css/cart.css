@@ -1,0 +1,77 @@
+.custom-btn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.custom-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.custom-btn:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7);
+}
+
+.custom-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.hero-area {
+    height: 400px; /* Điều chỉnh chiều cao theo ý muốn */
+    overflow: hidden; /* Ẩn phần nội dung vượt quá */
+}
+.btn-success:hover {
+    background-color: #28a745; /* Màu xanh đậm khi hover */
+    border-color: #28a745;
+}
+.btn-outline-success:hover {
+    background-color: #28a745; /* Màu xanh đậm khi hover */
+    color: white;
+}
+.cart-item {
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+/* Hiệu ứng fadeIn cho các phần tử */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng khi di chuột qua các nút */
+.btn:hover {
+    transform: scale(1.1); /* Phóng to nút khi hover */
+    transition: transform 0.2s ease-in-out;
+}
+
+.cart-input {
+    transition: transform 0.3s ease;
+}
+
+.cart-input:focus {
+    transform: scale(1.1); /* Tăng kích thước input khi focus */
+}
+
+/* Hiệu ứng cho các nút thanh toán */
+.btn-lg {
+    font-size: 1.25rem;
+    padding: 12px 30px;
+}
+
+/* Hiệu ứng hover cho nút thanh toán */
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-outline-success:hover {
+    background-color: #218838;
+    color: white;
+    border-color: #1e7e34;
+}
