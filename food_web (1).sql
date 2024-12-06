@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 05, 2024 at 09:58 AM
+-- Generation Time: Dec 06, 2024 at 02:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -40,8 +40,33 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `product_id`, `quantity`, `created_at`) VALUES
-(51, 11, 2, 1, '2024-12-05 07:26:17'),
-(52, 11, 3, 1, '2024-12-05 07:26:39');
+(68, 27, 2, 1, '2024-12-06 12:42:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comments`
+--
+
+CREATE TABLE `comments` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `user_name` varchar(255) NOT NULL,
+  `comment_text` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comments`
+--
+
+INSERT INTO `comments` (`id`, `product_id`, `user_name`, `comment_text`, `created_at`) VALUES
+(1, 5, 'nguyenminhquy', 'rat la ngon lun nha moi nguoi oi \r\n', '2024-12-06 11:50:16'),
+(2, 5, 'nguyenminhquy', 'rat la ngon lun nha moi nguoi oi \r\n', '2024-12-06 11:50:34'),
+(3, 5, 'nguyenminhquy', 'rat la ngon lun nha moi nguoi oi \r\n', '2024-12-06 11:51:18'),
+(4, 5, 'nguyenminhquy', 'rat bgi', '2024-12-06 11:51:26'),
+(5, 5, 'quoc', 'món ăn này rất ngon . toi rất thích món ăn này \r\n', '2024-12-06 12:08:02'),
+(6, 2, 'quy.nguyen050104', 'rat ngon \r\n', '2024-12-06 12:52:46');
 
 -- --------------------------------------------------------
 
@@ -111,7 +136,22 @@ INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `payment_method`, `order_
 (47, 11, 60000.00, 'cash', '2024-12-04 18:16:13'),
 (48, 11, 60000.00, 'cash', '2024-12-04 18:17:35'),
 (49, 11, 60000.00, 'cash', '2024-12-04 18:18:04'),
-(50, 11, 60000.00, 'credit_card', '2024-12-05 05:24:36');
+(50, 11, 60000.00, 'credit_card', '2024-12-05 05:24:36'),
+(51, 11, 150000.00, 'cash', '2024-12-05 10:26:40'),
+(52, 11, 120000.00, 'cash', '2024-12-06 03:23:26'),
+(53, 11, 2730000.00, 'cash', '2024-12-06 04:12:37'),
+(54, 11, 60000.00, 'bank_transfer', '2024-12-06 04:42:49'),
+(55, 11, 70000.00, 'bank_transfer', '2024-12-06 04:47:40'),
+(56, 11, 60000.00, 'bank_transfer', '2024-12-06 07:32:52'),
+(57, 11, 60000.00, 'cash', '2024-12-06 07:34:54'),
+(58, 11, 60000.00, 'cash', '2024-12-06 07:35:25'),
+(59, 11, 60000.00, 'cash', '2024-12-06 07:36:58'),
+(60, 11, 60000.00, 'cash', '2024-12-06 07:37:30'),
+(61, 11, 60000.00, 'cash', '2024-12-06 07:37:55'),
+(62, 11, 60000.00, 'cash', '2024-12-06 07:38:44'),
+(63, 11, 60000.00, 'cash', '2024-12-06 07:38:59'),
+(64, 11, 165000.00, 'bank_transfer', '2024-12-06 12:49:35'),
+(65, 11, 60000.00, 'bank_transfer', '2024-12-06 12:53:55');
 
 -- --------------------------------------------------------
 
@@ -181,7 +221,26 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`) 
 (47, 47, 2, 1, 0.00),
 (48, 48, 2, 1, 0.00),
 (49, 49, 2, 1, 0.00),
-(50, 50, 7, 1, 0.00);
+(50, 50, 7, 1, 0.00),
+(51, 51, 2, 1, 0.00),
+(52, 51, 3, 2, 0.00),
+(53, 52, 1, 1, 0.00),
+(54, 52, 5, 1, 0.00),
+(55, 53, 2, 42, 0.00),
+(56, 53, 5, 3, 0.00),
+(57, 54, 2, 1, 0.00),
+(58, 55, 5, 1, 0.00),
+(59, 56, 2, 1, 0.00),
+(60, 57, 2, 1, 0.00),
+(61, 58, 2, 1, 0.00),
+(62, 59, 2, 1, 0.00),
+(63, 60, 2, 1, 0.00),
+(64, 61, 2, 1, 0.00),
+(65, 62, 2, 1, 0.00),
+(66, 63, 2, 1, 0.00),
+(67, 64, 2, 2, 0.00),
+(68, 64, 3, 1, 0.00),
+(69, 65, 2, 1, 0.00);
 
 -- --------------------------------------------------------
 
@@ -259,7 +318,8 @@ INSERT INTO `users` (`id`, `username`, `password`, `role`, `created_at`, `email`
 (23, 'nguyenminhquy', '$2y$10$2479JJ580xipQyiG9gseD.7DuUIMm5DMLWJr55hKhlleA6oCALcwm', 'customer', '2024-12-02 16:54:46', 'quy.nguyen050104@hcmut.edu.vn', 'gregegergrg', '0855501412', '2024-12-19'),
 (24, 'NGUYENTHITONGA', '$2y$10$BB/r4sK5Ioah0VbzlQ3ztOE1K7wNenFQ5eSQ3Nzb7xNajH9OoEEOe', 'customer', '2024-12-02 17:20:25', '', NULL, NULL, NULL),
 (25, 'admin_minhquy', '$2y$10$XX8os1ZYwBnKFm4k6JTTFOY5rJTKq2mgym/pK6l7qFvSTLy/F7ynK', 'admin', '2024-12-02 17:33:12', '', NULL, NULL, NULL),
-(26, 'admin_nguyenminhquy', '$2y$10$En0w4cehLMDpR5peaPy4TO5WNCVbqXQrPOShWurrmWKAdHOmHgwEW', 'admin', '2024-12-03 12:32:50', '', NULL, NULL, NULL);
+(26, 'admin_nguyenminhquy', '$2y$10$En0w4cehLMDpR5peaPy4TO5WNCVbqXQrPOShWurrmWKAdHOmHgwEW', 'admin', '2024-12-03 12:32:50', '', NULL, NULL, NULL),
+(27, 'quoc', '$2y$10$GdgI1uxc2IG9s6e5Og7XFOMmaR6z7I/mh.n1vBRQrDVuj5aPrQp3S', 'customer', '2024-12-06 12:07:06', '', NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -272,6 +332,13 @@ ALTER TABLE `cart`
   ADD PRIMARY KEY (`cart_id`),
   ADD KEY `fk_user_id` (`user_id`),
   ADD KEY `fk_product_id` (`product_id`);
+
+--
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `product_id` (`product_id`);
 
 --
 -- Indexes for table `orders`
@@ -309,19 +376,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+
+--
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -333,7 +406,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Constraints for dumped tables
@@ -347,6 +420,12 @@ ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   ADD CONSTRAINT `fk_product_id` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 
 --
 -- Constraints for table `orders`
