@@ -22,16 +22,13 @@ $result_products = $conn->query($sql_products);
 $total_products = ($result_products->num_rows > 0) ? $result_products->fetch_assoc()['total_products'] : 0;
 
 // Lấy tổng doanh thu
-$sql_sales = "SELECT SUM(price) AS total_sales FROM products";
+$sql_sales = "SELECT SUM(total_amount) AS total_sales FROM orders";
 $result_sales = $conn->query($sql_sales);
 $total_sales = ($result_sales->num_rows > 0) ? $result_sales->fetch_assoc()['total_sales'] : 0;
 
 // Lấy user_id từ session (nếu người dùng đã đăng nhập)
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -40,12 +37,10 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
-
-	<!-- title -->
 	<title>THỨC ĂN NHÀ MÌNH </title>
 
 	<!-- favicon -->
-	<link rel="shortcut icon" type="image/png" href="./user_view/assets/img/logo.jpg">
+	<link rel="shortcut icon" type="image/png" href="../../assets/img/logo.jpg">
 	<!-- google font -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
@@ -76,55 +71,42 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
-
-
-	<!-- header -->
 <div class="top-header-area" id="sticker">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-sm-12 text-center">
-					<div class="main-menu-wrap">
-					                    <!-- logo -->
-										<div class="site-logo">
-    <a href="shop_user.php">
-        <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
-    </a>
-</div>
-
-
-
-
-
-
-
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12 col-sm-12 text-center">
+				<div class="main-menu-wrap">                 
+					<div class="site-logo">
+                        <a href="shop_user.php">
+                            <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
+                        </a>
+                    </div>
 						<!-- menu start -->
-						<nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-								
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
-						<!-- menu end -->
-					</div>
+                    <nav class="main-menu">
+						<ul>
+							<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
+							<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
+                            <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
+                            <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
+                            <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
+							<li>
+								<div class="header-icons">
+									<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
+									<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
+								</div>
+							</li>
+						</ul>
+					</nav>
+					<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+					<div class="mobile-menu"></div>
+					<!-- menu end -->
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- end header -->
+</div>
+<!-- end header -->
 
 
 <!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
@@ -150,29 +132,6 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-    
     <div class="container-fluid">
         <div class="row">
         <script>
@@ -229,54 +188,33 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         </li>
     </ul>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <!-- Main Content -->
-            <div class="col-md-9 p-4">
-                <div class="row">
-                    <!-- Card Total Products -->
-                    <div class="col-md-4">
-                        <div class="card bg-info text-white">
-                            <div class="card-header">
-                                <i class="fas fa-box"></i> Tổng Sản Phẩm
-                            </div>
-                            <div class="card-body text-center">
-                                <h3><?php echo $total_products; ?></h3>
-                                <p>Đang có tổng cộng các sản phẩm trong kho</p>
-                            </div>
-                        </div>
+    <!-- Main Content -->
+    <div class="col-md-9 p-4">
+        <div class="row">
+            <!-- Card Total Products -->
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-header">
+                        <i class="fas fa-box"></i> Tổng Sản Phẩm
                     </div>
-
-                    <!-- Card Total Sales -->
-                    <div class="col-md-4">
-                        <div class="card bg-success text-white">
-                            <div class="card-header">
-                                <i class="fas fa-dollar-sign"></i> Tổng Doanh Thu
-                            </div>
-                            <div class="card-body text-center">
-                                <h3><?php echo number_format($total_sales, 0, ',', '.'); ?> VNĐ</h3>
-                                <p>Tổng doanh thu từ tất cả sản phẩm</p>
-                            </div>
-                        </div>
+                    <div class="card-body text-center">
+                        <h3><?php echo $total_products; ?></h3>
+                        <p>Đang có tổng cộng các sản phẩm trong kho</p>
                     </div>
-
+                </div>
+            </div>
+            <!-- Card Total Sales -->
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-header">
+                        <i class="fas fa-dollar-sign"></i> Tổng Doanh Thu
+                    </div>
+                    <div class="card-body text-center">
+                        <h3><?php echo number_format($total_sales, 0, ',', '.'); ?> VNĐ</h3>
+                        <p>Tổng doanh thu từ tất cả sản phẩm</p>
+                    </div>
+                </div>
+            </div>
                     <!-- Card Add New Product -->
                     <div class="col-md-4">
                         <div class="card bg-warning text-white">
