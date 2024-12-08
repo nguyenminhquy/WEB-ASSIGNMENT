@@ -127,7 +127,7 @@ include "../config/connect_db.php"
                     </li>
                 </ul>
             </div>
-            <div class="container col-md-10 my-5">
+            <div class="container col-md-9 my-5">
                 <div class="justify-content-between align-items-center mb-4">
                     <h1>Danh sách sản phẩm</h1>
                     <button id="create-new" onclick="window.location.href='add_product.php'" class="btn btn-success">Thêm sản phẩm mới</button>

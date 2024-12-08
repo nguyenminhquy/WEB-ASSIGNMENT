@@ -159,7 +159,9 @@ $products_last_insert = ($result_products_last_insert->num_rows > 0)
     });
     </script>
     <div class="col-md-3 bg-light p-4">
-        <h3 class="text-center">Dashboard</h3>
+        <a href="index.php" class="text-decoration-none">
+            <h3 class="text-center">Dashboard</h3>
+        </a>
         <ul class="list-group">
             <!-- Danh sách sản phẩm -->
             <li class="list-group-item">
@@ -248,7 +250,7 @@ $products_last_insert = ($result_products_last_insert->num_rows > 0)
                 echo "<div>";
                 echo "<strong>Sản phẩm mới nhất:</strong><br>";
                 echo "<p>Tên: " . $products_last_insert['name'] . "</p>";
-                echo "<p>Giá: " . $products_last_insert['price'] . "</p>";
+                echo "<p>Giá: " . number_format($products_last_insert['price'], 0, ',', '.') . " VNĐ</p>";
                 echo "<p>Ngày thêm: " . $products_last_insert['created_at'] . "</p>";
                 echo "</div>";
             } else {
