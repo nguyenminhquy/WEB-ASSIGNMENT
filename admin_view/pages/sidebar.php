@@ -1,38 +1,80 @@
-<!-- Sidebar Start -->
-<div class="sidebar pe-4 pb-3">
-    <nav class="navbar bg-secondary navbar-dark">
-        <a href="index.php" class="navbar-brand mx-4 mb-3">
-            
-        </a>
-        <div class="d-flex align-items-center ms-4 mb-4">
-            <div class="position-relative">
-                <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-            </div>
-            <div class="ms-3">
+
+<link rel="stylesheet" href="../pages/css/sidebar.css">
+
+<div class="dashboard-container">
+    <h3 class="text-center">Dashboard</h3>
+    <ul class="list-group">
+        <!-- Quản lý người dùng -->
+        <li class="list-group-item">
+            <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">
+                <i class="fas fa-users me-2"></i> Quản lý người dùng
+            </a>
+            <ul class="collapse list-unstyled" id="productMenu">
+                <li><a href="product_list.php">Xem danh sách khách hàng</a></li>
+                <li><a href="add_product.php">Xem danh sách nhân viên</a></li>
+                <li><a href="delete_user.php">Xóa nhân viên</a></li>
+                <li><a href="edit_user.php">Chỉnh sửa thông tin sinh viên</a></li>
+            </ul>
+        </li>
+
+        <!-- Quản lý đơn hàng -->
+        <li class="list-group-item">
+            <a href="#orderMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">
+                <i class="fas fa-shopping-cart me-2"></i> Quản lý đơn hàng
+            </a>
+            <ul class="collapse list-unstyled" id="orderMenu">
+                <li><a href="orders_list.php">Xem đơn hàng</a></li>
+                <li><a href="./pending_orders.php">Danh sách đơn hàng đang chờ xử lý </a></li>
+                <li><a href="./canceled_orders.php">Danh sách đơn hàng bị hủy  </a></li>
+                <li><a href="./overtime_orders.php">Danh sách đơn hàng đang chờ lâu  </a></li>
                 
-                <span>Admin</span>
-            </div>
-        </div>
+            </ul>
+        </li>
 
-        <div class="navbar-nav w-100">
-           
-            <div class="nav-item dropdown">
-               
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Quản lý sản phẩm </a>
-                <div class="dropdown-menu bg-transparent border-0">
-                    <a href="danhsachsanpham.php" class="dropdown-item">DANH SÁCH SẢN PHẨM </a>
-                    <a href="themsanpham.php" class="dropdown-item">THÊM SẢN PHẨM MỚI  </a>
-                    <a href="xoasanpham.php" class="dropdown-item">XÓA SẢN PHẨM </a>
-                    <a href="chinhsanpham.php" class="dropdown-item">CHỈNH SỬA SẢN PHẨM  </a>
-                    
-                </div>
-              
-          
-            </div>
+        <!-- Quản lý sản phẩm -->
+        <li class="list-group-item">
+            <a href="#productManagementMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">
+                <i class="fas fa-box-open me-2"></i> Quản lý sản phẩm
+            </a>
+            <ul class="collapse list-unstyled" id="productManagementMenu">
+                <li><a href="product_list.php">Xem danh sách sản phẩm</a></li>
+                <li><a href="add_product.php">Thêm sản phẩm mới</a></li>
+                <li><a href="edit_product.php">Chỉnh sửa sản phẩm</a></li>
+                <li><a href="delete_product.php">Xóa sản phẩm</a></li>
+            </ul>
+        </li>
 
-           
-        </div>
-    </nav>
+        <!-- Quản lý bình luận và đánh giá -->
+        <li class="list-group-item">
+            <a href="#feedbackMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">
+                <i class="fas fa-comments me-2"></i> Quản lý bình luận & đánh giá
+            </a>
+            <ul class="collapse list-unstyled" id="feedbackMenu">
+                <li><a href="view_comments.php" class="d-block ps-3 py-1">Xem bình luận</a></li>
+                <li><a href="./view_comment_product.php" class="d-block ps-3 py-1">Xem bình luận theo từng sản phẩm</a></li>
+                <li><a href="./view_comment_user.php" class="d-block ps-3 py-1">Xem bình luận theo từng khách hàng </a></li>
+                
+                <li><a href="delete_feedback.php" class="d-block ps-3 py-1">Xóa bình luận & đánh giá</a></li>
+            </ul>
+        </li>
+
+        <!-- Thông tin người dùng -->
+        <li class="list-group-item">
+            <a href="#userMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">
+                <i class="fas fa-user-circle me-2"></i> Thông tin người dùng
+            </a>
+            <ul class="collapse list-unstyled" id="userMenu">
+                <li><a href="users_list.php">Thông tin cá nhân</a></li>
+                <li><a href="user_settings.php">Cài đặt</a></li>
+            </ul>
+        </li>
+
+        <!-- Đăng xuất -->
+        <li class="list-group-item">
+            <a href="../../user_view/pages/logout.php" class="d-block">
+                <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+            </a>
+        </li>
+    </ul>
 </div>
-<!-- Sidebar End -->
+

@@ -19,10 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user = $_POST['username'];
     $pass = $_POST['password'];
 
-    // Truy vấn cơ sở dữ liệu để lấy thông tin người dùng
-    $sql = "SELECT * FROM users WHERE username = ?"; // Truy vấn người dùng theo username
+    
+    $sql = "SELECT * FROM users WHERE username = ?"; 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('s', $user);  // Chèn username vào truy vấn
+    $stmt->bind_param('s', $user);  
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -102,7 +102,7 @@ $conn->close();
 <body>
 	
 
-     <?php include '../component/header.php'; ?>
+   
 	<?php include '../component/header_login.php'; ?>
 
 

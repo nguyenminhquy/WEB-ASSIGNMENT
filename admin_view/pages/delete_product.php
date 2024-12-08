@@ -1,69 +1,43 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
+
+// Kiểm tra nếu người dùng chưa đăng nhập
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";
+$password = "";
+$dbname = "food_web";
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
-$alert_message = "";
-
-// Kiểm tra nếu form đã được gửi
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-    $remain_product = $_POST['remain_product'];
-    $image_url = "";
-
-    // Xử lý hình ảnh upload
-    if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
-        move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
-    }
-
-    // Kiểm tra các trường không để trống
-    if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
-        $alert_message = "Vui lòng điền đầy đủ thông tin.";
+// Xóa sản phẩm nếu người dùng nhấn nút xóa
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product_id'])) {
+    $product_id = intval($_POST['delete_product_id']);
+    $sql_delete = "DELETE FROM products WHERE id = ?";
+    $stmt = $conn->prepare($sql_delete);
+    $stmt->bind_param("i", $product_id);
+    if ($stmt->execute()) {
+        $message = "Sản phẩm đã được xóa thành công!";
     } else {
-        // Câu truy vấn SQL
-        $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
-
-        // Chuẩn bị câu truy vấn
-        $stmt = $conn->prepare($sql);
-
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
-        if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
-        }
-
-        // Gắn tham số vào câu truy vấn
-        $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
-
-        // Thực thi câu truy vấn
-        if ($stmt->execute()) {
-            $alert_message = "Sản phẩm đã được thêm thành công!";
-        } else {
-            $alert_message = "Có lỗi xảy ra khi thêm sản phẩm.";
-        }
-
-        $stmt->close();
-    } 
+        $message = "Xóa sản phẩm thất bại. Vui lòng thử lại.";
+    }
+    $stmt->close();
 }
 
-$conn->close();
+// Truy vấn tất cả sản phẩm
+$sql = "SELECT * FROM products";
+$result = $conn->query($sql);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,9 +70,9 @@ $conn->close();
 	<link rel="stylesheet" href="../../user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="../../admin_view/pages/css/add_product.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/delete_product.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <script src="/admin_view/pages/"></script>
+    <script src="../pages/js/delete_product.js"></script>
     <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -112,10 +86,9 @@ $conn->close();
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
+
+
 <body>
-
-
-	<!-- header -->
 <div class="top-header-area" id="sticker">
 		<div class="container">
 			<div class="row">
@@ -208,71 +181,103 @@ $conn->close();
 <?php include './sidebar.php'; ?>
 </div>
 
+
+
+    
+
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-                   
-                <div class="container2 my-5">
-    <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
+                                
 
+
+
+
+
+
+
+
+                <div class="container mt-5">
+    <h1 class="text-center">Danh Sách Sản Phẩm</h1>
+    
     <!-- Hiển thị thông báo -->
-    <?php if (!empty($alert_message)): ?>
-        <div class="alert alert-info">
-            <?php echo $alert_message; ?>
+    <?php if (!empty($message)): ?>
+        <div class="alert alert-success">
+            <?= htmlspecialchars($message); ?>
         </div>
     <?php endif; ?>
 
-    <!-- Form Thêm Sản Phẩm -->
-    <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="price">Giá Sản Phẩm</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Mô Tả</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="available">Tình Trạng (Còn Hàng / Hết Hàng)</label>
-            <select class="form-control" id="available" name="available">
-                <option value="yes">Còn Hàng</option>
-                <option value="no">Hết Hàng</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="image_url">Chọn Hình Ảnh</label>
-            <input type="file" class="form-control" id="image_url" name="image_url" accept="image/*" required>
-        </div>
-        <div class="form-group">
-    <label for="remain_product">Số Lượng Còn Lại</label>
-    <input type="number" class="form-control" id="remain_product" name="remain_product" required>
+    <div class="row" id="product-list">
+        <?php if ($result->num_rows > 0): ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card product-card">
+                        <img src="<?= htmlspecialchars($row['image_url']); ?>" class="card-img-top" alt="<?= htmlspecialchars($row['name']); ?>">
+                        <div class="card-body">
+                            <h5 class="card-title"><?= htmlspecialchars($row['name']); ?></h5>
+                            <p class="card-text">Giá: <?= number_format($row['price'], 0, ',', '.'); ?> VND</p>
+                            <p class="card-text product-description"><?= htmlspecialchars($row['description']); ?></p>
+                            <p class="text-muted">Ngày tạo: <?= htmlspecialchars($row['created_at']); ?></p>
+                            <form action="" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                                <input type="hidden" name="delete_product_id" value="<?= $row['id']; ?>">
+                                <button type="submit" class="btn btn-danger">Xóa</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p class="text-center">Không có sản phẩm nào.</p>
+        <?php endif; ?>
+    </div>
 </div>
 
 
-        <button type="submit" class="btn btn-primary btn-block">Thêm Sản Phẩm</button>
-    </form>
-</div>
 
-                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 </div>
 
-            </div>
-        </div>
-    </div>
- 
-    <?php include '../../user_view/component/footer.php'; ?>
-    <!-- Bootstrap 4 JS & JQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+</div>
+</div>
+
+<?php include '../../user_view/component/footer.php'; ?>
+<!-- Bootstrap 4 JS & JQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
+</body>
 </html>
 
+<?php
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>

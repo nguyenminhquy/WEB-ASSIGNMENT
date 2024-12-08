@@ -1,0 +1,81 @@
+/* Table Styling */
+.table-container {
+    margin-top: 30px;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #f1f1f1;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #ffebcc;
+    transition: background-color 0.3s ease;
+}
+
+/* Badge Styling */
+.badge {
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 0.3em 0.6em;
+    border-radius: 0.5em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge.bg-warning::before {
+    content: "\f017"; /* Clock icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+
+.badge.bg-warning.text-dark:hover {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+/* Pagination Styling */
+.pagination .page-item .page-link {
+    color: #007bff;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+.pagination .page-item .page-link:hover {
+    background-color: #007bff;
+    color: white;
+    transform: scale(1.1);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,14 +1,12 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";
+$password = "";
+$dbname = "food_web";
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Kiểm tra kết nối
@@ -16,54 +14,34 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
-$alert_message = "";
+// Kiểm tra và xóa bình luận
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_id'])) {
+    $comment_id = intval($_POST['comment_id']);
+    $sql_delete = "DELETE FROM comments WHERE id = ?";
+    $stmt = $conn->prepare($sql_delete);
+    $stmt->bind_param("i", $comment_id);
 
-// Kiểm tra nếu form đã được gửi
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-    $remain_product = $_POST['remain_product'];
-    $image_url = "";
-
-    // Xử lý hình ảnh upload
-    if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
-        move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
-    }
-
-    // Kiểm tra các trường không để trống
-    if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
-        $alert_message = "Vui lòng điền đầy đủ thông tin.";
+    if ($stmt->execute()) {
+        $message = "Bình luận đã được xóa thành công!";
     } else {
-        // Câu truy vấn SQL
-        $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
-
-        // Chuẩn bị câu truy vấn
-        $stmt = $conn->prepare($sql);
-
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
-        if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
-        }
-
-        // Gắn tham số vào câu truy vấn
-        $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
-
-        // Thực thi câu truy vấn
-        if ($stmt->execute()) {
-            $alert_message = "Sản phẩm đã được thêm thành công!";
-        } else {
-            $alert_message = "Có lỗi xảy ra khi thêm sản phẩm.";
-        }
-
-        $stmt->close();
-    } 
+        $message = "Xóa bình luận thất bại. Vui lòng thử lại.";
+    }
+    $stmt->close();
 }
 
-$conn->close();
+// Truy vấn tất cả bình luận
+$sql = "SELECT c.id, c.comment_text, c.created_at, c.user_name, p.name AS product_name
+        FROM comments c
+        JOIN products p ON c.product_id = p.id
+        ORDER BY c.created_at DESC";
+$result = $conn->query($sql);
+
+if (!$result) {
+    die("Truy vấn thất bại: " . $conn->error);
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,7 +74,7 @@ $conn->close();
 	<link rel="stylesheet" href="../../user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="../../admin_view/pages/css/add_product.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/product_list.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
     <script src="/admin_view/pages/"></script>
     <!-- Bootstrap CSS -->
@@ -112,11 +90,10 @@ $conn->close();
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
+
 <body>
-
-
 	<!-- header -->
-<div class="top-header-area" id="sticker">
+    <div class="top-header-area" id="sticker">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12 col-sm-12 text-center">
@@ -208,71 +185,88 @@ $conn->close();
 <?php include './sidebar.php'; ?>
 </div>
 
-            <!-- Main Content -->
-            <div class="col-md-9 p-4">
+  <!-- Main Content -->
+  <div class="col-md-9 p-4">
                 <div class="row">
-                   
-                <div class="container2 my-5">
-    <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
 
-    <!-- Hiển thị thông báo -->
-    <?php if (!empty($alert_message)): ?>
-        <div class="alert alert-info">
-            <?php echo $alert_message; ?>
-        </div>
+
+
+       <div class="container mt-5">
+      <h1 class="text-center mb-4">Danh Sách Bình Luận</h1>
+
+       <!-- Hiển thị danh sách bình luận -->
+        <?php if ($result->num_rows > 0): ?>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Tên Người Dùng</th>
+                    <th>Sản Phẩm</th>
+                    <th>Bình Luận</th>
+                    <th>Ngày Tạo</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['id']); ?></td>
+                        <td><?= htmlspecialchars($row['user_name']); ?></td>
+                        <td><?= htmlspecialchars($row['product_name']); ?></td>
+                        <td><?= htmlspecialchars($row['comment_text']); ?></td>
+                        <td><?= date("d/m/Y H:i:s", strtotime($row['created_at'])); ?></td>
+                        <td>
+                            <form action="" method="POST">
+                                <input type="hidden" name="comment_id" value="<?= $row['id']; ?>">
+                                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p class="text-center">Không có bình luận nào.</p>
     <?php endif; ?>
 
-    <!-- Form Thêm Sản Phẩm -->
-    <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="price">Giá Sản Phẩm</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Mô Tả</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="available">Tình Trạng (Còn Hàng / Hết Hàng)</label>
-            <select class="form-control" id="available" name="available">
-                <option value="yes">Còn Hàng</option>
-                <option value="no">Hết Hàng</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="image_url">Chọn Hình Ảnh</label>
-            <input type="file" class="form-control" id="image_url" name="image_url" accept="image/*" required>
-        </div>
-        <div class="form-group">
-    <label for="remain_product">Số Lượng Còn Lại</label>
-    <input type="number" class="form-control" id="remain_product" name="remain_product" required>
+    <div class="text-center mt-4">
+        <a href="./index.php" class="btn btn-primary">Quay Lại Dashboard</a>
+    </div>
 </div>
 
-
-        <button type="submit" class="btn btn-primary btn-block">Thêm Sản Phẩm</button>
-    </form>
-</div>
-
-                   
-                </div>
-
+<!-- Modal thông báo -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <?= htmlspecialchars($message); ?>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
             </div>
         </div>
     </div>
- 
-    <?php include '../../user_view/component/footer.php'; ?>
-    <!-- Bootstrap 4 JS & JQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+</div>
 
+<?php if (!empty($message)): ?>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        messageModal.show();
+    });
+</script>
+<?php endif; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
 </html>
 
+<?php
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>

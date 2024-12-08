@@ -1,14 +1,12 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";
+$password = "";
+$dbname = "food_web";
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Kiểm tra kết nối
@@ -16,54 +14,23 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
-$alert_message = "";
+// Lấy danh sách sản phẩm
+$sql_products = "SELECT id, name FROM products";
+$result_products = $conn->query($sql_products);
 
-// Kiểm tra nếu form đã được gửi
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-    $remain_product = $_POST['remain_product'];
-    $image_url = "";
-
-    // Xử lý hình ảnh upload
-    if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
-        move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
-    }
-
-    // Kiểm tra các trường không để trống
-    if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
-        $alert_message = "Vui lòng điền đầy đủ thông tin.";
-    } else {
-        // Câu truy vấn SQL
-        $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
-
-        // Chuẩn bị câu truy vấn
-        $stmt = $conn->prepare($sql);
-
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
-        if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
-        }
-
-        // Gắn tham số vào câu truy vấn
-        $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
-
-        // Thực thi câu truy vấn
-        if ($stmt->execute()) {
-            $alert_message = "Sản phẩm đã được thêm thành công!";
-        } else {
-            $alert_message = "Có lỗi xảy ra khi thêm sản phẩm.";
-        }
-
-        $stmt->close();
-    } 
+// Lọc bình luận theo sản phẩm
+$product_id = isset($_GET['product_id']) ? intval($_GET['product_id']) : 0;
+$sql_comments = "SELECT c.id, c.comment_text, c.created_at, c.user_name, p.name AS product_name
+                 FROM comments c
+                 JOIN products p ON c.product_id = p.id";
+if ($product_id > 0) {
+    $sql_comments .= " WHERE c.product_id = $product_id";
 }
+$sql_comments .= " ORDER BY c.created_at DESC";
 
-$conn->close();
+$result_comments = $conn->query($sql_comments);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,7 +63,7 @@ $conn->close();
 	<link rel="stylesheet" href="../../user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="../../admin_view/pages/css/add_product.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/product_list.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
     <script src="/admin_view/pages/"></script>
     <!-- Bootstrap CSS -->
@@ -208,71 +175,117 @@ $conn->close();
 <?php include './sidebar.php'; ?>
 </div>
 
+
+
+    
+
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-                   
-                <div class="container2 my-5">
-    <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
-
-    <!-- Hiển thị thông báo -->
-    <?php if (!empty($alert_message)): ?>
-        <div class="alert alert-info">
-            <?php echo $alert_message; ?>
-        </div>
-    <?php endif; ?>
-
-    <!-- Form Thêm Sản Phẩm -->
-    <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="price">Giá Sản Phẩm</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Mô Tả</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="available">Tình Trạng (Còn Hàng / Hết Hàng)</label>
-            <select class="form-control" id="available" name="available">
-                <option value="yes">Còn Hàng</option>
-                <option value="no">Hết Hàng</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="image_url">Chọn Hình Ảnh</label>
-            <input type="file" class="form-control" id="image_url" name="image_url" accept="image/*" required>
-        </div>
-        <div class="form-group">
-    <label for="remain_product">Số Lượng Còn Lại</label>
-    <input type="number" class="form-control" id="remain_product" name="remain_product" required>
-</div>
 
 
-        <button type="submit" class="btn btn-primary btn-block">Thêm Sản Phẩm</button>
-    </form>
-</div>
 
-                   
-                </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Danh Sách Bình Luận Theo Sản Phẩm</h1>
+
+    <!-- Bộ lọc sản phẩm -->
+    <form action="" method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <select name="product_id" class="form-select">
+                    <option value="0">Tất cả sản phẩm</option>
+                    <?php while ($product = $result_products->fetch_assoc()): ?>
+                        <option value="<?= $product['id']; ?>" <?= $product_id == $product['id'] ? 'selected' : ''; ?>>
+                            <?= htmlspecialchars($product['name']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
             </div>
         </div>
+    </form>
+
+    <!-- Hiển thị danh sách bình luận -->
+    <?php if ($result_comments->num_rows > 0): ?>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Tên Người Dùng</th>
+                    <th>Sản Phẩm</th>
+                    <th>Bình Luận</th>
+                    <th>Ngày Tạo</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($comment = $result_comments->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($comment['id']); ?></td>
+                        <td><?= htmlspecialchars($comment['user_name']); ?></td>
+                        <td><?= htmlspecialchars($comment['product_name']); ?></td>
+                        <td><?= htmlspecialchars($comment['comment_text']); ?></td>
+                        <td><?= date("d/m/Y H:i:s", strtotime($comment['created_at'])); ?></td>
+                        <td>
+                            <form action="delete_comment.php" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bình luận này?');">
+                                <input type="hidden" name="comment_id" value="<?= $comment['id']; ?>">
+                                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p class="text-center">Không có bình luận nào.</p>
+    <?php endif; ?>
+
+    <div class="text-center mt-4">
+        <a href="./index.php" class="btn btn-primary">Quay Lại Dashboard</a>
     </div>
- 
-    <?php include '../../user_view/component/footer.php'; ?>
-    <!-- Bootstrap 4 JS & JQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+
+</div>
+
+</div>
+</div>
+</div>
+
+<?php include '../../user_view/component/footer.php'; ?>
+<!-- Bootstrap 4 JS & JQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
+
+<?php
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>
 

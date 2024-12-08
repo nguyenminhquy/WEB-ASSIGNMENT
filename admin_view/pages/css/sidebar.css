@@ -1,0 +1,57 @@
+
+/* CSS tùy chỉnh */
+.dashboard-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-container h3 {
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+.dashboard-container .list-group-item {
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.dashboard-container .list-group-item a {
+    color: #343a40;
+    text-decoration: none;
+}
+
+.dashboard-container .list-group-item:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.dashboard-container .list-group-item a:hover {
+    color: #ffffff;
+}
+
+.dashboard-container .list-group .collapse a {
+    color: #495057;
+    padding-left: 20px;
+}
+
+.dashboard-container .list-group .collapse a:hover {
+    background-color: #f1f1f1;
+    border-radius: 5px;
+}
+
+.dashboard-container .list-group-item .collapse.show {
+    background-color: #e9ecef;
+}
+
+.dashboard-container .list-group .collapse.show a {
+    font-weight: 600;
+}
+

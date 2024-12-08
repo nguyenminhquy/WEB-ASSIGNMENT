@@ -1,0 +1,61 @@
+.table {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Màu nền cho dòng lẻ */
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #ffffff; /* Màu nền cho dòng chẵn */
+}
+
+.table-hover tbody tr:hover {
+    background-color:#ffc107; /* Màu nền khi hover */
+    transition: background-color 0.3s ease;
+}
+
+.badge {
+    font-size: 0.875rem; /* Kích thước nhỏ hơn mặc định */
+    padding: 0.5em 0.75em;
+    border-radius: 0.5rem;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107; /* Màu vàng cảnh báo */
+    color: #212529; /* Màu chữ tối */
+}
+
+.badge.bg-success {
+    background-color: #28a745; /* Màu xanh hoàn thành */
+    color: #fff;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545; /* Màu đỏ lỗi */
+    color: #fff;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d; /* Màu xám không xác định */
+    color: #fff;
+}
+
+thead.table-dark th {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+tbody td {
+    vertical-align: middle; /* Căn giữa nội dung theo chiều dọc */
+}
+
+.table-container {
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+}

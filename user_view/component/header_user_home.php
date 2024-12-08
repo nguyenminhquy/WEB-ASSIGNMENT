@@ -64,3 +64,17 @@
     </div>
 </div>
 <!-- end header -->
+<?php
+
+$session_timeout = 10 * 60;  
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_unset(); 
+    session_destroy(); 
+    header("Location: login.php");  
+    exit();
+}
+
+$_SESSION['last_activity'] = time();
+?>
+

@@ -1,14 +1,12 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";
+$password = "";
+$dbname = "food_web";
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Kiểm tra kết nối
@@ -16,54 +14,29 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
-$alert_message = "";
+// Số đơn hàng trên mỗi trang
+$items_per_page = 10;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Trang hiện tại
+$offset = ($current_page - 1) * $items_per_page; // Tính toán OFFSET
 
-// Kiểm tra nếu form đã được gửi
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-    $remain_product = $_POST['remain_product'];
-    $image_url = "";
+// Truy vấn danh sách đơn hàng
+$sql = "SELECT o.id, o.total_amount, o.payment_method, o.order_date, o.status, u.username
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        WHERE o.status = 'Pending' AND TIMESTAMPDIFF(MINUTE, o.order_date, NOW()) > 30
+        ORDER BY o.order_date DESC
+        LIMIT $items_per_page OFFSET $offset";
 
-    // Xử lý hình ảnh upload
-    if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
-        move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
-    }
+$result = $conn->query($sql);
 
-    // Kiểm tra các trường không để trống
-    if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
-        $alert_message = "Vui lòng điền đầy đủ thông tin.";
-    } else {
-        // Câu truy vấn SQL
-        $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
-
-        // Chuẩn bị câu truy vấn
-        $stmt = $conn->prepare($sql);
-
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
-        if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
-        }
-
-        // Gắn tham số vào câu truy vấn
-        $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
-
-        // Thực thi câu truy vấn
-        if ($stmt->execute()) {
-            $alert_message = "Sản phẩm đã được thêm thành công!";
-        } else {
-            $alert_message = "Có lỗi xảy ra khi thêm sản phẩm.";
-        }
-
-        $stmt->close();
-    } 
-}
-
-$conn->close();
+// Truy vấn tổng số đơn hàng chờ trên 30 phút
+$sql_total = "SELECT COUNT(*) as total FROM orders o
+              WHERE o.status = 'Pending' AND TIMESTAMPDIFF(MINUTE, o.order_date, NOW()) > 30";
+$total_result = $conn->query($sql_total);
+$total_orders = $total_result->fetch_assoc()['total'];
+$total_pages = ceil($total_orders / $items_per_page); // Tổng số trang
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,8 +69,9 @@ $conn->close();
 	<link rel="stylesheet" href="../../user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="../../admin_view/pages/css/add_product.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/product_list.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
+    <link rel="stylesheet" href="../pages/css/overtime_orders.css">
     <script src="/admin_view/pages/"></script>
     <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -208,57 +182,72 @@ $conn->close();
 <?php include './sidebar.php'; ?>
 </div>
 
+
+
+    
+
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-                   
-                <div class="container2 my-5">
-    <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
+                <div class="container table-container">
+    <h1 class="text-center">Đơn Hàng Chờ Xử Lý Trên 30 Phút</h1>
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th><i class="fas fa-user"></i> Tên Khách Hàng</th>
+                <th><i class="fas fa-coins"></i> Tổng Tiền</th>
+                <th><i class="fas fa-credit-card"></i> Phương Thức Thanh Toán</th>
+                <th><i class="fas fa-info-circle"></i> Trạng Thái</th>
+                <th><i class="fas fa-clock"></i> Ngày Đặt Hàng</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($order = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($order['id']); ?></td>
+                        <td><?= htmlspecialchars($order['username']); ?></td>
+                        <td><?= number_format($order['total_amount'], 0, ',', '.'); ?> VND</td>
+                        <td><?= htmlspecialchars($order['payment_method']); ?></td>
+                        <td><span class="badge bg-warning text-dark">Đang xử lý</span></td>
+                        <td><?= date("d/m/Y H:i:s", strtotime($order['order_date'])); ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="6" class="text-center">Không có đơn hàng nào chờ xử lý trên 30 phút.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
-    <!-- Hiển thị thông báo -->
-    <?php if (!empty($alert_message)): ?>
-        <div class="alert alert-info">
-            <?php echo $alert_message; ?>
-        </div>
-    <?php endif; ?>
+    <!-- Nút phân trang -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <?php if ($current_page > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?= $current_page - 1; ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            <?php endif; ?>
 
-    <!-- Form Thêm Sản Phẩm -->
-    <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
+            <?php for ($page = 1; $page <= $total_pages; $page++): ?>
+                <li class="page-item <?= $page == $current_page ? 'active' : ''; ?>">
+                    <a class="page-link" href="?page=<?= $page; ?>"><?= $page; ?></a>
+                </li>
+            <?php endfor; ?>
 
-        <div class="form-group">
-            <label for="price">Giá Sản Phẩm</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Mô Tả</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="available">Tình Trạng (Còn Hàng / Hết Hàng)</label>
-            <select class="form-control" id="available" name="available">
-                <option value="yes">Còn Hàng</option>
-                <option value="no">Hết Hàng</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="image_url">Chọn Hình Ảnh</label>
-            <input type="file" class="form-control" id="image_url" name="image_url" accept="image/*" required>
-        </div>
-        <div class="form-group">
-    <label for="remain_product">Số Lượng Còn Lại</label>
-    <input type="number" class="form-control" id="remain_product" name="remain_product" required>
-</div>
-
-
-        <button type="submit" class="btn btn-primary btn-block">Thêm Sản Phẩm</button>
-    </form>
+            <?php if ($current_page < $total_pages): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?= $current_page + 1; ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </nav>
 </div>
 
                    
@@ -276,3 +265,7 @@ $conn->close();
 
 </html>
 
+<?php
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>

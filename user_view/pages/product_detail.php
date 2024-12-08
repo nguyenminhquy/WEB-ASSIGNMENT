@@ -122,7 +122,7 @@ $comments = $stmt_comments->fetchAll(PDO::FETCH_ASSOC);
                 <input type="hidden" name="quantity" value="1">
 
                 <button type="submit" class="btn add-to-cart">Thêm vào giỏ hàng</button>
-                <a href="../user_home.php" class="btn continue-shopping">Tiếp tục mua sắm</a>
+                <a href="./shop_user.php" class="btn continue-shopping">Tiếp tục mua sắm</a>
             </form>
         </div>
     </div>

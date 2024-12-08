@@ -63,7 +63,7 @@
 						<!-- menu start -->
 						<nav class="main-menu">
 							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
+								<li class="current-list-item"><a href="index.php">TRANG CHỦ </a></li>
 								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
                                 <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
                                 <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>

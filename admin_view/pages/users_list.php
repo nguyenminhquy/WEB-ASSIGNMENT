@@ -1,14 +1,12 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";
+$password = "";
+$dbname = "food_web";
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Kiểm tra kết nối
@@ -16,54 +14,12 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
-$alert_message = "";
-
-// Kiểm tra nếu form đã được gửi
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-    $remain_product = $_POST['remain_product'];
-    $image_url = "";
-
-    // Xử lý hình ảnh upload
-    if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
-        move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
-    }
-
-    // Kiểm tra các trường không để trống
-    if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
-        $alert_message = "Vui lòng điền đầy đủ thông tin.";
-    } else {
-        // Câu truy vấn SQL
-        $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
-
-        // Chuẩn bị câu truy vấn
-        $stmt = $conn->prepare($sql);
-
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
-        if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
-        }
-
-        // Gắn tham số vào câu truy vấn
-        $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
-
-        // Thực thi câu truy vấn
-        if ($stmt->execute()) {
-            $alert_message = "Sản phẩm đã được thêm thành công!";
-        } else {
-            $alert_message = "Có lỗi xảy ra khi thêm sản phẩm.";
-        }
-
-        $stmt->close();
-    } 
-}
-
-$conn->close();
+// Truy vấn danh sách người dùng
+$sql = "SELECT id, username FROM users";
+$result = $conn->query($sql);
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,8 +52,9 @@ $conn->close();
 	<link rel="stylesheet" href="../../user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="../../admin_view/pages/css/add_product.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/product_list.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
+    <link rel="stylesheet" href="./css/users_list.css">
     <script src="/admin_view/pages/"></script>
     <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -208,58 +165,54 @@ $conn->close();
 <?php include './sidebar.php'; ?>
 </div>
 
+
+
+    
+
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-                   
-                <div class="container2 my-5">
-    <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
 
-    <!-- Hiển thị thông báo -->
-    <?php if (!empty($alert_message)): ?>
-        <div class="alert alert-info">
-            <?php echo $alert_message; ?>
-        </div>
-    <?php endif; ?>
 
-    <!-- Form Thêm Sản Phẩm -->
-    <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
+                <div class="container mt-5">
+    <h1 class="text-center">Danh Sách Người Dùng</h1>
 
-        <div class="form-group">
-            <label for="price">Giá Sản Phẩm</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
+    <form method="GET" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="search" class="form-control" placeholder="Nhập tên người dùng" value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+</form>
 
-        <div class="form-group">
-            <label for="description">Mô Tả</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
 
-        <div class="form-group">
-            <label for="available">Tình Trạng (Còn Hàng / Hết Hàng)</label>
-            <select class="form-control" id="available" name="available">
-                <option value="yes">Còn Hàng</option>
-                <option value="no">Hết Hàng</option>
-            </select>
-        </div>
+    <!-- Danh sách người dùng -->
+    <div class="list-group user-list">
+        <?php
+        // Lọc danh sách người dùng dựa trên từ khóa tìm kiếm
+        $search = isset($_GET['search']) ? $_GET['search'] : '';
+        $sql = "SELECT * FROM users WHERE username LIKE ?";
+        $stmt = $conn->prepare($sql);
+        $search_param = '%' . $search . '%';
+        $stmt->bind_param("s", $search_param);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        <div class="form-group">
-            <label for="image_url">Chọn Hình Ảnh</label>
-            <input type="file" class="form-control" id="image_url" name="image_url" accept="image/*" required>
-        </div>
-        <div class="form-group">
-    <label for="remain_product">Số Lượng Còn Lại</label>
-    <input type="number" class="form-control" id="remain_product" name="remain_product" required>
+        if ($result->num_rows > 0): 
+            while ($row = $result->fetch_assoc()): ?>
+                <a href="user_details.php?id=<?= $row['id']; ?>" class="list-group-item">
+                    <?= htmlspecialchars($row['username']); ?>
+                </a>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p class="text-center">Không có người dùng nào.</p>
+        <?php endif; ?>
+    </div>
 </div>
 
 
-        <button type="submit" class="btn btn-primary btn-block">Thêm Sản Phẩm</button>
-    </form>
-</div>
+
 
                    
                 </div>
@@ -276,3 +229,7 @@ $conn->close();
 
 </html>
 
+<?php
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>

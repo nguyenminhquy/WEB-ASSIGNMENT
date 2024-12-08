@@ -1,14 +1,12 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";
+$password = "";
+$dbname = "food_web";
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Kiểm tra kết nối
@@ -16,54 +14,22 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
-$alert_message = "";
+// Truy vấn đơn hàng "Pending" và lấy username từ bảng users
+$sql = "SELECT o.id, o.total_amount, o.payment_method, o.status, o.order_date, u.username
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        WHERE o.status = 'Pending'
+        ORDER BY o.order_date DESC";
 
-// Kiểm tra nếu form đã được gửi
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-    $remain_product = $_POST['remain_product'];
-    $image_url = "";
+$result = $conn->query($sql);
 
-    // Xử lý hình ảnh upload
-    if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
-        move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
-    }
-
-    // Kiểm tra các trường không để trống
-    if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
-        $alert_message = "Vui lòng điền đầy đủ thông tin.";
-    } else {
-        // Câu truy vấn SQL
-        $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
-
-        // Chuẩn bị câu truy vấn
-        $stmt = $conn->prepare($sql);
-
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
-        if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
-        }
-
-        // Gắn tham số vào câu truy vấn
-        $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
-
-        // Thực thi câu truy vấn
-        if ($stmt->execute()) {
-            $alert_message = "Sản phẩm đã được thêm thành công!";
-        } else {
-            $alert_message = "Có lỗi xảy ra khi thêm sản phẩm.";
-        }
-
-        $stmt->close();
-    } 
+if (!$result) {
+    die("Truy vấn thất bại: " . $conn->error);
 }
-
-$conn->close();
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,8 +62,9 @@ $conn->close();
 	<link rel="stylesheet" href="../../user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="../../admin_view/pages/css/add_product.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/product_list.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
+    <link rel="stylesheet" href="./css/pending_orders.css">
     <script src="/admin_view/pages/"></script>
     <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -208,58 +175,94 @@ $conn->close();
 <?php include './sidebar.php'; ?>
 </div>
 
+
+
+    
+
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-                   
-                <div class="container2 my-5">
-    <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
+               
 
-    <!-- Hiển thị thông báo -->
-    <?php if (!empty($alert_message)): ?>
-        <div class="alert alert-info">
-            <?php echo $alert_message; ?>
+
+
+
+
+
+                <div class="container mt-5">
+    <h1 class="text-center mb-4">Đơn Hàng Đang Chờ Xử Lý</h1>
+    
+    <?php if ($result->num_rows > 0): ?>
+        <div class="table-container">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Tên Khách Hàng</th>
+                        <th>Tổng Tiền</th>
+                        <th>Phương Thức Thanh Toán</th>
+                        <th>Trạng Thái</th>
+                        <th>Ngày Đặt Hàng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($order = $result->fetch_assoc()): ?>
+                        <tr>
+    <td>
+        <i class="fas fa-hashtag text-primary"></i> 
+        <?= htmlspecialchars($order['id']); ?>
+    </td>
+    <td>
+        <i class="fas fa-user text-success"></i> 
+        <?= htmlspecialchars($order['username']); ?>
+    </td>
+    <td>
+        <i class="fas fa-money-bill-wave text-warning"></i> 
+        <?= number_format($order['total_amount'], 0, ',', '.'); ?> VND
+    </td>
+    <td>
+        <i class="fas fa-credit-card text-info"></i> 
+        <?= htmlspecialchars($order['payment_method']); ?>
+    </td>
+    <td>
+        <i class="fas fa-spinner text-danger"></i> 
+        <span class="badge badge-pending">Đang xử lý</span>
+    </td>
+    <td>
+        <i class="fas fa-calendar-alt text-secondary"></i> 
+        <?= date("d/m/Y H:i:s", strtotime($order['order_date'])); ?>
+    </td>
+</tr>
+
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
+    <?php else: ?>
+        <p class="text-center">Không có đơn hàng nào đang chờ xử lý.</p>
     <?php endif; ?>
 
-    <!-- Form Thêm Sản Phẩm -->
-    <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="price">Giá Sản Phẩm</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Mô Tả</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="available">Tình Trạng (Còn Hàng / Hết Hàng)</label>
-            <select class="form-control" id="available" name="available">
-                <option value="yes">Còn Hàng</option>
-                <option value="no">Hết Hàng</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="image_url">Chọn Hình Ảnh</label>
-            <input type="file" class="form-control" id="image_url" name="image_url" accept="image/*" required>
-        </div>
-        <div class="form-group">
-    <label for="remain_product">Số Lượng Còn Lại</label>
-    <input type="number" class="form-control" id="remain_product" name="remain_product" required>
+    <div class="text-center mt-4">
+        <a href="./index.php" class="btn btn-secondary">Quay Lại</a>
+    </div>
 </div>
 
 
-        <button type="submit" class="btn btn-primary btn-block">Thêm Sản Phẩm</button>
-    </form>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                    
                 </div>
@@ -275,4 +278,11 @@ $conn->close();
 </body>
 
 </html>
+
+<?php
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>
+
+
 

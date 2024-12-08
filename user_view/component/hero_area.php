@@ -10,9 +10,9 @@
                         <div class="hero-btns">
                             <!-- Kiểm tra nếu người dùng đã đăng nhập -->
                             <?php if (isset($_SESSION['user_id'])): ?>
-                                <a href="shop.php" class="boxed-btn">MUA NGAY THÔI</a>
+                                <a href="../pages/shop_user.php" class="boxed-btn">MUA NGAY THÔI</a>
                             <?php else: ?>
-                                <a href="login.php" class="boxed-btn">ĐĂNG NHẬP ĐỂ MUA</a>
+                                <a href="../../user_view/pages/login.php" class="boxed-btn">ĐĂNG NHẬP ĐỂ MUA</a>
                             <?php endif; ?>
                         </div>
                     </div>

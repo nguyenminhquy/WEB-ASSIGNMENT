@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($result_check->num_rows > 0) {
             $error_message = "Tài khoản đã tồn tại!";
         } else {
-            // Mã hóa mật khẩu trước khi lưu
+            
             $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
             // Lưu thông tin người dùng vào cơ sở dữ liệu

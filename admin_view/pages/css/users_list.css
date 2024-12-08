@@ -1,0 +1,93 @@
+.user-list .list-group-item {
+    border: 1px solid #ddd; /* Viền nhẹ */
+    padding: 10px 20px;
+    background-color: #e0f7fa; /* Màu nền dòng lẻ */
+    transition: all 0.3s ease-in-out; /* Hiệu ứng chuyển đổi */
+    color: #004d40; /* Màu chữ */
+    font-weight: bold;
+}
+
+.user-list .list-group-item:nth-child(even) {
+    background-color: #ffccbc; /* Màu nền dòng chẵn */
+    color: #bf360c; /* Màu chữ cho dòng chẵn */
+}
+
+.user-list .list-group-item:hover {
+    background-color: #ffd740; /* Màu nền khi hover */
+    transform: scale(1.05); /* Phóng to hơn */
+    box-shadow: 0px 5px 15px rgba(255, 193, 7, 0.5); /* Đổ bóng màu vàng nhạt */
+    color: #5d4037; /* Đổi màu chữ khi hover */
+}
+
+.user-list .list-group-item:active {
+    background-color: #81d4fa; /* Màu nền khi nhấn */
+    color: #004d40; /* Màu chữ khi nhấn */
+    box-shadow: 0px 2px 5px rgba(0, 150, 136, 0.5); /* Đổ bóng màu xanh biển */
+    transform: scale(0.98); /* Giảm kích thước nhẹ khi nhấn */
+}
+
+.user-list .list-group-item:nth-child(odd):hover {
+    background-color: #ff8a65; /* Màu nền hover cho dòng lẻ */
+    color: #3e2723; /* Màu chữ nổi bật */
+}
+
+.user-list .list-group-item:nth-child(even):hover {
+    background-color: #4fc3f7; /* Màu nền hover cho dòng chẵn */
+    color: #01579b; /* Màu chữ nổi bật */
+}
+.input-group .form-control {
+    border-radius: 0;
+    box-shadow: none;
+    transition: border-color 0.3s;
+}
+
+.input-group .form-control:focus {
+    border-color: #3498db;
+}
+
+.input-group .btn-primary {
+    border-radius: 0;
+    background-color: #3498db;
+    border-color: #3498db;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.input-group .btn-primary:hover {
+    background-color: #1d6fa5;
+    transform: scale(1.05);
+}
+/* Form tìm kiếm */
+/* Form tìm kiếm */
+.input-group {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.input-group .form-control {
+    border-radius: 50px 0 0 50px; /* Bo góc trái */
+    border: 2px solid #3498db; 
+    transition: all 0.3s ease-in-out;
+}
+
+.input-group .form-control:focus {
+    border-color: #1d6fa5; 
+    box-shadow: 0px 0px 10px rgba(29, 111, 165, 0.5);
+}
+
+.input-group .btn-primary {
+    border-radius: 0 50px 50px 0; /* Bo góc phải */
+    background-color: #3498db; 
+    border-color: #3498db; 
+    transition: background-color 0.3s, transform 0.2s;
+    padding: 10px 20px; /* Tăng kích thước để phù hợp với icon */
+}
+
+.input-group .btn-primary:hover {
+    background-color: #1d6fa5; 
+    transform: scale(1.05);
+}
+
+.input-group .btn-primary i {
+    font-size: 16px; /* Kích thước icon */
+    color: white; /* Màu icon */
+}

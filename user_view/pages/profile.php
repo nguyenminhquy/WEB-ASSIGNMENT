@@ -44,25 +44,25 @@ $conn->close();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+   
 	<!-- title -->
 	<title>THỨC ĂN NHÀ MÌNH </title>
 
 	<!-- favicon -->
-	<link rel="shortcut icon" type="image/png" href="assets/img/favicon.png">
+	<link rel="shortcut icon" type="image/png" href="../assets/img/favicon.png">
+
     <!-- CSS and other links -->
-    <link rel="stylesheet" href="assets/css/all.min.css">
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <!-- Thêm Animate.css vào phần <head> -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="../assets/css/all.min.css">
+    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    
 
 </head>
 <body>
 
     <!-- Header and main content -->
-    <?php include './component/preloader.php'; ?>
-    <?php include './component/header_user_home.php'; ?>
+   
+    <?php include '../component/header_user_home.php'; ?>
 
 
 	<div class="profile-hero">
@@ -84,7 +84,7 @@ $conn->close();
 
 <style>
 .profile-hero {
-    background-image: url('./assets/img/advertise.png'); /* Đường dẫn hình ảnh */
+    background-image: url('../../assets/img/advertise.png'); /* Đường dẫn hình ảnh */
     background-size: cover; /* Đảm bảo ảnh bao phủ toàn bộ phần tử */
     background-position: center center; /* Căn chỉnh ảnh ở giữa */
     background-repeat: no-repeat; /* Ngăn chặn việc lặp lại ảnh */
@@ -159,10 +159,7 @@ $conn->close();
                             <label for="dob" class="form-label fs-5">Ngày Sinh</label>
                             <input type="date" class="form-control form-control-lg" id="dob" value="<?php echo htmlspecialchars($user['dob']); ?>" disabled>
                         </div>
-                        <div class="mb-3">
-                            <label for="role" class="form-label fs-5">Vai trò</label>
-                            <input type="text" class="form-control form-control-lg" id="role" value="<?php echo htmlspecialchars($user['role']); ?>" disabled>
-                        </div>
+                        
 
                         <!-- Button to log out -->
 
@@ -201,12 +198,12 @@ $conn->close();
     </div>
 
     <!-- Footer -->
-    <?php include './component/footer.php'; ?>
+    <?php include '../component/footer.php'; ?>
 
     <!-- Scripts -->
-    <script src="assets/js/jquery-1.11.3.min.js"></script>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="../../assets/js/jquery-1.11.3.min.js"></script>
+    <script src="../../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../assets/js/main.js"></script>
 
 </body>
 </html>

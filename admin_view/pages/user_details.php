@@ -1,14 +1,12 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
 // Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";
+$password = "";
+$dbname = "food_web";
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Kiểm tra kết nối
@@ -16,54 +14,33 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
-$alert_message = "";
+// Lấy thông tin người dùng
+$user_id = intval($_GET['id']);
+$sql_user = "SELECT * FROM users WHERE id = ?";
+$stmt_user = $conn->prepare($sql_user);
+$stmt_user->bind_param("i", $user_id);
+$stmt_user->execute();
+$user_result = $stmt_user->get_result();
+$user = $user_result->fetch_assoc();
 
-// Kiểm tra nếu form đã được gửi
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-    $remain_product = $_POST['remain_product'];
-    $image_url = "";
+// Lấy lịch sử mua hàng
+$sql_orders = "SELECT id, total_amount, order_date FROM orders WHERE user_id = ? ORDER BY order_date DESC";
+$stmt_orders = $conn->prepare($sql_orders);
+$stmt_orders->bind_param("i", $user_id);
+$stmt_orders->execute();
+$order_result = $stmt_orders->get_result();
 
-    // Xử lý hình ảnh upload
-    if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
-        move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
-    }
-
-    // Kiểm tra các trường không để trống
-    if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
-        $alert_message = "Vui lòng điền đầy đủ thông tin.";
-    } else {
-        // Câu truy vấn SQL
-        $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
-
-        // Chuẩn bị câu truy vấn
-        $stmt = $conn->prepare($sql);
-
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
-        if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
-        }
-
-        // Gắn tham số vào câu truy vấn
-        $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
-
-        // Thực thi câu truy vấn
-        if ($stmt->execute()) {
-            $alert_message = "Sản phẩm đã được thêm thành công!";
-        } else {
-            $alert_message = "Có lỗi xảy ra khi thêm sản phẩm.";
-        }
-
-        $stmt->close();
-    } 
-}
-
-$conn->close();
+// Lấy giỏ hàng hiện tại
+$sql_cart = "SELECT p.name, c.quantity, (p.price * c.quantity) AS total_price 
+             FROM cart c 
+             JOIN products p ON c.product_id = p.id 
+             WHERE c.user_id = ?";
+$stmt_cart = $conn->prepare($sql_cart);
+$stmt_cart->bind_param("i", $user_id);
+$stmt_cart->execute();
+$cart_result = $stmt_cart->get_result();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,6 +55,8 @@ $conn->close();
 	<!-- favicon -->
 	<link rel="shortcut icon" type="image/png" href="./user_view/assets/img/logo.jpg">
 	<!-- google font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
 	<!-- fontawesome -->
@@ -96,9 +75,11 @@ $conn->close();
 	<link rel="stylesheet" href="../../user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="../../admin_view/pages/css/add_product.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/product_list.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
+    <link rel="stylesheet" href="./css/users_list.css">
     <script src="/admin_view/pages/"></script>
+    <link rel="stylesheet" href="./css/user_details.css">
     <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -112,10 +93,10 @@ $conn->close();
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
+
+
 <body>
-
-
-	<!-- header -->
+    	<!-- header -->
 <div class="top-header-area" id="sticker">
 		<div class="container">
 			<div class="row">
@@ -127,12 +108,6 @@ $conn->close();
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
-
-
-
-
-
-
 
 						<!-- menu start -->
 						<nav class="main-menu">
@@ -208,71 +183,107 @@ $conn->close();
 <?php include './sidebar.php'; ?>
 </div>
 
+
+
+    
+
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-                   
-                <div class="container2 my-5">
-    <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
+<div class="container mt-5">
+    <h1 class="text-center">Thông Tin Người Dùng</h1>
 
-    <!-- Hiển thị thông báo -->
-    <?php if (!empty($alert_message)): ?>
-        <div class="alert alert-info">
-            <?php echo $alert_message; ?>
-        </div>
+    <?php if ($user): ?>
+        <div class="card mb-4">
+    <div class="card-body">
+        <h3 class="card-title">
+            <i class="fas fa-user-circle me-2"></i> <!-- Icon người dùng -->
+            <?= htmlspecialchars($user['username']); ?>
+        </h3>
+        <p>
+            <i class="fas fa-envelope me-2"></i> <!-- Icon email -->
+            <strong>Email:</strong> <?= htmlspecialchars($user['email']); ?>
+        </p>
+        <p>
+            <i class="fas fa-calendar-alt me-2"></i> <!-- Icon lịch -->
+            <strong>Ngày Tạo:</strong> <?= date("d/m/Y", strtotime($user['created_at'])); ?>
+        </p>
+    </div>
+</div>
+
+
+        <h2 class="mt-4">Lịch Sử Mua Hàng</h2>
+        <?php if ($order_result->num_rows > 0): ?>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tổng Tiền</th>
+                        <th>Ngày Đặt Hàng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($order = $order_result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($order['id']); ?></td>
+                            <td><?= number_format($order['total_amount'], 0, ',', '.'); ?> VND</td>
+                            <td><?= date("d/m/Y", strtotime($order['order_date'])); ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p>Không có lịch sử mua hàng.</p>
+        <?php endif; ?>
+
+        <h2 class="mt-4">Giỏ Hàng Hiện Tại</h2>
+        <?php if ($cart_result->num_rows > 0): ?>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sản Phẩm</th>
+                        <th>Số Lượng</th>
+                        <th>Thành Tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($cart_item = $cart_result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($cart_item['name']); ?></td>
+                            <td><?= htmlspecialchars($cart_item['quantity']); ?></td>
+                            <td><?= number_format($cart_item['total_price'], 0, ',', '.'); ?> VND</td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p>Giỏ hàng trống.</p>
+        <?php endif; ?>
+
+    <?php else: ?>
+        <p>Người dùng không tồn tại.</p>
     <?php endif; ?>
 
-    <!-- Form Thêm Sản Phẩm -->
-    <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="price">Giá Sản Phẩm</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Mô Tả</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="available">Tình Trạng (Còn Hàng / Hết Hàng)</label>
-            <select class="form-control" id="available" name="available">
-                <option value="yes">Còn Hàng</option>
-                <option value="no">Hết Hàng</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="image_url">Chọn Hình Ảnh</label>
-            <input type="file" class="form-control" id="image_url" name="image_url" accept="image/*" required>
-        </div>
-        <div class="form-group">
-    <label for="remain_product">Số Lượng Còn Lại</label>
-    <input type="number" class="form-control" id="remain_product" name="remain_product" required>
-</div>
-
-
-        <button type="submit" class="btn btn-primary btn-block">Thêm Sản Phẩm</button>
-    </form>
-</div>
-
-                   
-                </div>
-
-            </div>
-        </div>
+    <div class="mt-4">
+        <a href="users_list.php" class="btn btn-secondary">Quay Lại</a>
     </div>
+</div>
  
-    <?php include '../../user_view/component/footer.php'; ?>
-    <!-- Bootstrap 4 JS & JQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+</div>
+</div>
+</div>
+
+<?php include '../../user_view/component/footer.php'; ?>
+<!-- Bootstrap 4 JS & JQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
 
+<?php
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>

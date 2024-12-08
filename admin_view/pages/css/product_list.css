@@ -1,0 +1,140 @@
+ /* Tạo hiệu ứng hover cho sản phẩm */
+ .product-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animation khi hover */
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.product-card:hover {
+    transform: translateY(-10px); /* Di chuyển nhẹ khi hover */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng khi hover */
+}
+
+/* Hiệu ứng hình ảnh sản phẩm */
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.1); /* Phóng to ảnh khi hover */
+}
+
+.product-info {
+    margin-top: 10px;
+}
+
+/* Phân biệt các trạng thái "Còn hàng" và "Hết hàng" */
+.available {
+    font-weight: bold;
+    color: green;
+}
+
+.out-of-stock {
+    font-weight: bold;
+    color: red;
+}
+
+/* Animation cho sản phẩm */
+.product-card {
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Điều chỉnh chiều rộng của thẻ sản phẩm */
+.col-md-4 {
+    margin-bottom: 20px;
+}
+.product-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animation khi hover */
+    overflow: hidden;
+    background-color: #fff;
+    height: 100%; /* Đảm bảo các card có cùng chiều cao */
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-10px); /* Di chuyển nhẹ khi hover */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng khi hover */
+}
+
+/* Hiệu ứng hình ảnh sản phẩm */
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.1); /* Phóng to ảnh khi hover */
+}
+
+.product-info {
+    margin-top: 10px;
+    flex-grow: 1; /* Giúp phần thông tin sản phẩm có thể co giãn */
+}
+
+.available {
+    font-weight: bold;
+    color: green;
+}
+
+.out-of-stock {
+    font-weight: bold;
+    color: red;
+}
+
+/* Animation cho sản phẩm */
+.product-card {
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Điều chỉnh chiều rộng của thẻ sản phẩm */
+.col-md-4 {
+    margin-bottom: 20px;
+}
+
+/* Đảm bảo các sản phẩm có kích thước đồng đều */
+.product-card .product-info h5,
+.product-card .product-info p {
+    margin-bottom: 10px;
+}
+/* CSS cho sản phẩm hết hàng */
+.out-of-stock {
+    opacity: 0.5; /* Làm mờ sản phẩm */
+    pointer-events: none; /* Vô hiệu hóa các sự kiện chuột (không thể click vào sản phẩm) */
+}
+
+/* CSS cho sản phẩm còn hàng */
+.available {
+    opacity: 1; /* Đảm bảo sản phẩm còn hàng không bị mờ */
+}
