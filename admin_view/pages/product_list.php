@@ -43,41 +43,9 @@ include "../config/connect_db.php"
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="top-header-area" id="sticker">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-sm-12 text-center">
-                    <div class="main-menu-wrap">                 
-                        <div class="site-logo">
-                            <a href="shop_user.php">
-                                <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
-                            </a>
-                        </div>
-                            <!-- menu start -->
-                        <nav class="main-menu">
-                            <ul>
-                                <li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-                                <li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-                                <li>
-                                    <div class="header-icons">
-                                        <a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-                                        <a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </nav>
-                        <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-                        <div class="mobile-menu"></div>
-                        <!-- menu end -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- end header -->
+    <?php
+    include_once"../includes/header.php"
+    ?>
 
 
     <!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
@@ -121,82 +89,84 @@ include "../config/connect_db.php"
                 });
             });
             </script>
-    <div class="col-md-2 bg-light p-4">
-        <h3 class="text-center">Dashboard</h3>
-        <ul class="list-group">
-            <!-- Danh sách sản phẩm -->
-            <li class="list-group-item">
-                <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Danh sách sản phẩm</a>
-                <ul class="collapse list-unstyled" id="productMenu">
-                    <li><a href="product_list.php" class="d-block ps-3 py-1">Xem sản phẩm</a></li>
-                    <li><a href="add_product.php" class="d-block ps-3 py-1">Thêm sản phẩm</a></li>
-                    <li><a href="edit_product.php" class="d-block ps-3 py-1">Sửa sản phẩm</a></li>
-                </ul>
-            </li>
-            <!--  -->
-            <!-- Đơn hàng -->
-            <li class="list-group-item">
-                <a href="#orderMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Đơn hàng</a>
-                <ul class="collapse list-unstyled" id="orderMenu">
-                    <li><a href="orders.php" class="d-block ps-3 py-1">Xem đơn hàng</a></li>
-                    <li><a href="order_history.php" class="d-block ps-3 py-1">Lịch sử đơn hàng</a></li>
-                    <li><a href="order_status.php" class="d-block ps-3 py-1">Trạng thái đơn hàng</a></li>
-                </ul>
-            </li>
+            <div class="col-md-2 bg-light p-4">
+                <h3 class="text-center">Dashboard</h3>
+                <ul class="list-group">
+                    <!-- Danh sách sản phẩm -->
+                    <li class="list-group-item">
+                        <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Danh sách sản phẩm</a>
+                        <ul class="collapse list-unstyled" id="productMenu">
+                            <li><a href="product_list.php" class="d-block ps-3 py-1">Xem sản phẩm</a></li>
+                            <li><a href="add_product.php" class="d-block ps-3 py-1">Thêm sản phẩm</a></li>
+                            <li><a href="edit_product.php" class="d-block ps-3 py-1">Sửa sản phẩm</a></li>
+                        </ul>
+                    </li>
+                    <!--  -->
+                    <!-- Đơn hàng -->
+                    <li class="list-group-item">
+                        <a href="#orderMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Đơn hàng</a>
+                        <ul class="collapse list-unstyled" id="orderMenu">
+                            <li><a href="orders.php" class="d-block ps-3 py-1">Xem đơn hàng</a></li>
+                            <li><a href="order_history.php" class="d-block ps-3 py-1">Lịch sử đơn hàng</a></li>
+                            <li><a href="order_status.php" class="d-block ps-3 py-1">Trạng thái đơn hàng</a></li>
+                        </ul>
+                    </li>
 
-            <!-- Thông tin người dùng -->
-            <li class="list-group-item">
-                <a href="#userMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Thông tin người dùng</a>
-                <ul class="collapse list-unstyled" id="userMenu">
-                    <li><a href="user_profile.php" class="d-block ps-3 py-1">Thông tin cá nhân</a></li>
-                    <li><a href="user_settings.php" class="d-block ps-3 py-1">Cài đặt</a></li>
-                </ul>
-            </li>
+                    <!-- Thông tin người dùng -->
+                    <li class="list-group-item">
+                        <a href="#userMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Thông tin người dùng</a>
+                        <ul class="collapse list-unstyled" id="userMenu">
+                            <li><a href="user_profile.php" class="d-block ps-3 py-1">Thông tin cá nhân</a></li>
+                            <li><a href="user_settings.php" class="d-block ps-3 py-1">Cài đặt</a></li>
+                        </ul>
+                    </li>
 
-            <!-- Đăng xuất -->
-            <li class="list-group-item">
-                <a href="logout.php" class="d-block">Đăng xuất</a>
-            </li>
-        </ul>
-    </div>
-    <div class="container my-5">
-        <div class="justify-content-between align-items-center mb-4">
-            <h1>Danh sách sản phẩm</h1>
-            <button id="create-new" onclick="window.location.href='add_product.php'" class="btn btn-success">Thêm sản phẩm mới</button>
+                    <!-- Đăng xuất -->
+                    <li class="list-group-item">
+                        <a href="logout.php" class="d-block">Đăng xuất</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="container col-md-10 my-5">
+                <div class="justify-content-between align-items-center mb-4">
+                    <h1>Danh sách sản phẩm</h1>
+                    <button id="create-new" onclick="window.location.href='add_product.php'" class="btn btn-success">Thêm sản phẩm mới</button>
+                </div>
+                <table border="1" cellpadding='6' cellspacing='0' table table-striped table-hover table-bordered align-middle>
+                    <thead class="bg-dark text-white text-center">
+                        <tr id="title-table">
+                            <th>ID</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Mô tả</th>
+                            <th>Giá</th>
+                            <th>Hình ảnh</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if ($result) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td class='text-center'>" . $row['id'] . "</td>";
+                                echo "<td>" . $row['name'] . "</td>";
+                                echo "<td>" . $row['description'] . "</td>";
+                                echo "<td>" . number_format($row['price'], 0, ',', '.') . " VNĐ</td>";
+                                echo "<td><img src='" . $row['image_url'] . "' alt='" . $row['name'] . "' width='150' height='150'></td>";
+                                echo "<td>";
+                                echo "<button id='delete' onclick=\"window.location.href='delete.php?product_id=" . $row['id'] . "'\">Xóa</button>";
+                                echo "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='4' class='text-center text-muted';>Không có sản phẩm nào.</td></tr>";
+                        }
+                        $conn->close();
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <table border="1" cellpadding='6' cellspacing='0' table table-striped table-hover table-bordered align-middle>
-            <thead class="bg-dark text-white text-center">
-                <tr id="title-table">
-                    <th>ID</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Mô tả</th>
-                    <th>Giá</th>
-                    <th>Hình ảnh</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td class='text-center'>" . $row['id'] . "</td>";
-                        echo "<td>" . $row['name'] . "</td>";
-                        echo "<td>" . $row['description'] . "</td>";
-                        echo "<td>" . number_format($row['price'], 0, ',', '.') . " VNĐ</td>";
-                        echo "<td><img src='" . $row['image_url'] . "' alt='" . $row['name'] . "' width='120' height='120'></td>";
-                        echo "<td>";
-                        echo "<button id='delete' onclick=\"window.location.href='delete.php?product_id=" . $row['id'] . "'\">Xóa</button>";
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='4' class='text-center text-muted';>Không có sản phẩm nào.</td></tr>";
-                }
-                $conn->close();
-                ?>
-            </tbody>
-        </table>
     </div>
 </body>
 </html>

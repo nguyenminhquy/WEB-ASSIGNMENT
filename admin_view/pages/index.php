@@ -28,6 +28,14 @@ $total_sales = ($result_sales->num_rows > 0) ? $result_sales->fetch_assoc()['tot
 
 // Lấy user_id từ session (nếu người dùng đã đăng nhập)
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+// Lấy sản phẩm vừa được thêm vào database
+$sql_products_last_insert = "SELECT * FROM products ORDER BY created_at DESC LIMIT 1";
+$result_products_last_insert = $conn->query($sql_products_last_insert);
+
+$products_last_insert = ($result_products_last_insert->num_rows > 0) 
+    ? $result_products_last_insert->fetch_assoc() 
+    : null;
 ?>
 
 <!DOCTYPE html>
@@ -135,7 +143,7 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     <div class="container-fluid">
         <div class="row">
         <script>
-    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
         // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
@@ -149,45 +157,45 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             });
         });
     });
-</script>
-<div class="col-md-3 bg-light p-4">
-    <h3 class="text-center">Dashboard</h3>
-    <ul class="list-group">
-        <!-- Danh sách sản phẩm -->
-        <li class="list-group-item">
-            <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Danh sách sản phẩm</a>
-            <ul class="collapse list-unstyled" id="productMenu">
-                <li><a href="product_list.php" class="d-block ps-3 py-1">Xem sản phẩm</a></li>
-                <li><a href="add_product.php" class="d-block ps-3 py-1">Thêm sản phẩm</a></li>
-                <li><a href="edit_product.php" class="d-block ps-3 py-1">Sửa sản phẩm</a></li>
-            </ul>
-        </li>
-        
-        <!-- Đơn hàng -->
-        <li class="list-group-item">
-            <a href="#orderMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Đơn hàng</a>
-            <ul class="collapse list-unstyled" id="orderMenu">
-                <li><a href="orders.php" class="d-block ps-3 py-1">Xem đơn hàng</a></li>
-                <li><a href="order_history.php" class="d-block ps-3 py-1">Lịch sử đơn hàng</a></li>
-                <li><a href="order_status.php" class="d-block ps-3 py-1">Trạng thái đơn hàng</a></li>
-            </ul>
-        </li>
+    </script>
+    <div class="col-md-3 bg-light p-4">
+        <h3 class="text-center">Dashboard</h3>
+        <ul class="list-group">
+            <!-- Danh sách sản phẩm -->
+            <li class="list-group-item">
+                <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Danh sách sản phẩm</a>
+                <ul class="collapse list-unstyled" id="productMenu">
+                    <li><a href="product_list.php" class="d-block ps-3 py-1">Xem sản phẩm</a></li>
+                    <li><a href="add_product.php" class="d-block ps-3 py-1">Thêm sản phẩm</a></li>
+                    <li><a href="edit_product.php" class="d-block ps-3 py-1">Sửa sản phẩm</a></li>
+                </ul>
+            </li>
+            
+            <!-- Đơn hàng -->
+            <li class="list-group-item">
+                <a href="#orderMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Đơn hàng</a>
+                <ul class="collapse list-unstyled" id="orderMenu">
+                    <li><a href="orders.php" class="d-block ps-3 py-1">Xem đơn hàng</a></li>
+                    <li><a href="order_history.php" class="d-block ps-3 py-1">Lịch sử đơn hàng</a></li>
+                    <li><a href="order_status.php" class="d-block ps-3 py-1">Trạng thái đơn hàng</a></li>
+                </ul>
+            </li>
 
-        <!-- Thông tin người dùng -->
-        <li class="list-group-item">
-            <a href="#userMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Thông tin người dùng</a>
-            <ul class="collapse list-unstyled" id="userMenu">
-                <li><a href="user_profile.php" class="d-block ps-3 py-1">Thông tin cá nhân</a></li>
-                <li><a href="user_settings.php" class="d-block ps-3 py-1">Cài đặt</a></li>
-            </ul>
-        </li>
+            <!-- Thông tin người dùng -->
+            <li class="list-group-item">
+                <a href="#userMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Thông tin người dùng</a>
+                <ul class="collapse list-unstyled" id="userMenu">
+                    <li><a href="user_profile.php" class="d-block ps-3 py-1">Thông tin cá nhân</a></li>
+                    <li><a href="user_settings.php" class="d-block ps-3 py-1">Cài đặt</a></li>
+                </ul>
+            </li>
 
-        <!-- Đăng xuất -->
-        <li class="list-group-item">
-            <a href="logout.php" class="d-block">Đăng xuất</a>
-        </li>
-    </ul>
-</div>
+            <!-- Đăng xuất -->
+            <li class="list-group-item">
+                <a href="logout.php" class="d-block">Đăng xuất</a>
+            </li>
+        </ul>
+    </div>
     <!-- Main Content -->
     <div class="col-md-9 p-4">
         <div class="row">
@@ -215,75 +223,49 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
                     </div>
                 </div>
             </div>
-                    <!-- Card Add New Product -->
-                    <div class="col-md-4">
-                        <div class="card bg-warning text-white">
-                            <div class="card-header">
-                                <i class="fas fa-plus-circle"></i> Thêm Món Ăn
-                            </div>
-                            <div class="card-body text-center">
-                                <a href="add_product.php" class="btn btn-light btn-lg">Thêm Sản Phẩm</a>
-                            </div>
-                        </div>
+            <!-- Card Add New Product -->
+            <div class="col-md-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-header">
+                        <i class="fas fa-plus-circle"></i> Thêm Món Ăn
+                    </div>
+                    <div class="card-body text-center">
+                        <a href="add_product.php" class="btn btn-light btn-lg">Thêm Sản Phẩm</a>
                     </div>
                 </div>
-
-                <!-- Recent Activity -->
-                <div class="card mt-4">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
-                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
-                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
-                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
-                        </ul>
-                    </div>
-                </div>
-                  <!-- Recent Activity -->
-                  <div class="card mt-4">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
-                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
-                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
-                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
-                        </ul>
-                    </div>
-                </div>
-                  <!-- Recent Activity -->
-                  <div class="card mt-4">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
-                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
-                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
-                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
-                        </ul>
-                    </div>
-                </div>
-                
             </div>
         </div>
+
+        <!-- Recent Activity -->
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
+            </div>
+            <?php
+            echo '<div class="card-body">';
+            echo '<ul class="list-group">';
+            if ($products_last_insert) {
+                echo "<div>";
+                echo "<strong>Sản phẩm mới nhất:</strong><br>";
+                echo "<p>Tên: " . $products_last_insert['name'] . "</p>";
+                echo "<p>Giá: " . $products_last_insert['price'] . "</p>";
+                echo "<p>Ngày thêm: " . $products_last_insert['created_at'] . "</p>";
+                echo "</div>";
+            } else {
+                echo "<p>Không có sản phẩm nào.</p>";
+            }
+            echo '</ul>';
+            echo '</div>';
+            ?>
+        </div>
     </div>
- 
+</div>
+</div>
     <?php include '../../user_view/component/footer.php'; ?>
-    <!-- Bootstrap 4 JS & JQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
-
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>
