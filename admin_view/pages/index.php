@@ -158,43 +158,68 @@ $products_last_insert = ($result_products_last_insert->num_rows > 0)
         });
     });
     </script>
-    <div class="col-md-3 bg-light p-4">
-        <a href="index.php" class="text-decoration-none">
-            <h3 class="text-center">Dashboard</h3>
+    <div class="col-md-3 bg-light p-4 shadow-sm">
+        <a href="index.php" class="text-decoration-none text-dark">
+            <h3 class="text-center mb-4">Dashboard</h3>
         </a>
         <ul class="list-group">
             <!-- Danh sách sản phẩm -->
             <li class="list-group-item">
-                <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Danh sách sản phẩm</a>
-                <ul class="collapse list-unstyled" id="productMenu">
-                    <li><a href="product_list.php" class="d-block ps-3 py-1">Xem sản phẩm</a></li>
-                    <li><a href="add_product.php" class="d-block ps-3 py-1">Thêm sản phẩm</a></li>
-                    <li><a href="edit_product.php" class="d-block ps-3 py-1">Sửa sản phẩm</a></li>
+                <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block fw-bold text-decoration-none text-dark">
+                    Danh sách sản phẩm
+                    <span class="float-end"><i class="bi bi-chevron-down"></i></span>
+                </a>
+                <ul class="collapse list-unstyled ps-3" id="productMenu">
+                    <li>
+                        <a href="product_list.php" class="d-block py-1 text-decoration-none hover-effect">Xem sản phẩm</a>
+                    </li>
+                    <li>
+                        <a href="add_product.php" class="d-block py-1 text-decoration-none hover-effect">Thêm sản phẩm</a>
+                    </li>
+                    <li>
+                        <a href="edit_product.php" class="d-block py-1 text-decoration-none hover-effect">Sửa sản phẩm</a>
+                    </li>
                 </ul>
             </li>
-            
+
             <!-- Đơn hàng -->
             <li class="list-group-item">
-                <a href="#orderMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Đơn hàng</a>
-                <ul class="collapse list-unstyled" id="orderMenu">
-                    <li><a href="orders.php" class="d-block ps-3 py-1">Xem đơn hàng</a></li>
-                    <li><a href="order_history.php" class="d-block ps-3 py-1">Lịch sử đơn hàng</a></li>
-                    <li><a href="order_status.php" class="d-block ps-3 py-1">Trạng thái đơn hàng</a></li>
+                <a href="#productMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block fw-bold text-decoration-none text-dark">
+                    Sản phẩm
+                    <span class="float-end"><i class="bi bi-chevron-down"></i></span>
+                </a>
+                <ul class="collapse list-unstyled ps-3" id="productMenu">
+                    <li>
+                        <a href="product_list.php" class="d-block py-1 text-decoration-none hover-effect">Thông tin sản phẩm</a>
+                    </li>
+                    <li>
+                        <a href="add_product.php" class="d-block py-1 text-decoration-none hover-effect">Thêm sản phẩm mới</a>
+                    </li>
+                    <li>
+                        <a href="edit_product.php" class="d-block py-1 text-decoration-none hover-effect">Chỉnh sửa thông tin</a>
+                    </li>
                 </ul>
             </li>
 
             <!-- Thông tin người dùng -->
             <li class="list-group-item">
-                <a href="#userMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block">Thông tin người dùng</a>
-                <ul class="collapse list-unstyled" id="userMenu">
-                    <li><a href="user_profile.php" class="d-block ps-3 py-1">Thông tin cá nhân</a></li>
-                    <li><a href="user_settings.php" class="d-block ps-3 py-1">Cài đặt</a></li>
+                <a href="#userMenu" data-bs-toggle="collapse" aria-expanded="false" class="d-block fw-bold text-decoration-none text-dark">
+                    Thông tin người dùng
+                    <span class="float-end"><i class="bi bi-chevron-down"></i></span>
+                </a>
+                <ul class="collapse list-unstyled ps-3" id="userMenu">
+                    <li>
+                        <a href="user_profile.php" class="d-block py-1 text-decoration-none hover-effect">Thông tin cá nhân</a>
+                    </li>
+                    <li>
+                        <a href="user_settings.php" class="d-block py-1 text-decoration-none hover-effect">Cài đặt</a>
+                    </li>
                 </ul>
             </li>
 
             <!-- Đăng xuất -->
             <li class="list-group-item">
-                <a href="logout.php" class="d-block">Đăng xuất</a>
+                <a href="logout.php" class="d-block fw-bold text-decoration-none text-danger hover-effect">Đăng xuất</a>
             </li>
         </ul>
     </div>
