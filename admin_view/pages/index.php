@@ -29,7 +29,14 @@ $total_sales = ($result_sales->num_rows > 0) ? $result_sales->fetch_assoc()['tot
 // Lấy user_id từ session (nếu người dùng đã đăng nhập)
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
+$sql_latest_product = "SELECT * FROM products ORDER BY id DESC LIMIT 1";
+$result_latest = $conn->query($sql_latest_product);
 
+if ($result_latest->num_rows > 0) {
+    $latest_product = $result_latest->fetch_assoc();
+} else {
+    $latest_product = null;
+}
 ?>
 
 
@@ -244,46 +251,36 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
                 <!-- Recent Activity -->
                 <div class="card mt-4">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
-                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
-                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
-                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
-                        </ul>
-                    </div>
-                </div>
-                  <!-- Recent Activity -->
-                  <div class="card mt-4">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
-                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
-                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
-                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
-                        </ul>
-                    </div>
-                </div>
-                  <!-- Recent Activity -->
-                  <div class="card mt-4">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
-                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
-                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
-                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
-                        </ul>
-                    </div>
-                </div>
+    <div class="card-header bg-primary text-white">
+        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            <?php
+            // Truy vấn sản phẩm mới nhất
+            $sql_latest_product = "SELECT * FROM products ORDER BY id DESC LIMIT 1";
+            $result_latest = $conn->query($sql_latest_product);
+
+            if ($result_latest->num_rows > 0) {
+                $latest_product = $result_latest->fetch_assoc();
+                echo '<li class="list-group-item">Đã thêm sản phẩm mới: <strong>' . htmlspecialchars($latest_product['name']) . '</strong></li>';
+            } else {
+                echo '<li class="list-group-item">Chưa có sản phẩm mới được thêm.</li>';
+            }
+            $sql_latest_price_update = "SELECT * FROM products WHERE updated_at IS NOT NULL ORDER BY updated_at DESC LIMIT 1";
+            $result_latest_price_update = $conn->query($sql_latest_price_update);
+
+            if ($result_latest_price_update->num_rows > 0) {
+                $latest_price_update = $result_latest_price_update->fetch_assoc();
+                echo '<li class="list-group-item">Đã cập nhật giá cho món: <strong>' . htmlspecialchars($latest_price_update['name']) . '</strong> (Giá mới: ' . htmlspecialchars($latest_price_update['price']) . ' VND)</li>';
+            } else {
+                echo '<li class="list-group-item">Chưa có sản phẩm nào được cập nhật giá.</li>';
+            }
+            // Có thể thêm các hoạt động khác như cập nhật giá, đơn hàng mới...
+            ?>
+        </ul>
+    </div>
+</div>
                 
             </div>
         </div>

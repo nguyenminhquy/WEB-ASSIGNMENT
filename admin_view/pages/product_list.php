@@ -19,6 +19,26 @@ if ($conn->connect_error) {
 // Truy vấn tất cả sản phẩm
 $sql = "SELECT * FROM products";
 $result = $conn->query($sql);
+
+$products_per_page = 3;
+
+// Xác định trang hiện tại từ URL (nếu không có thì mặc định là trang 1)
+$current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+
+// Xác định tổng số sản phẩm
+$sql_count = "SELECT COUNT(*) AS total_products FROM products";
+$result_count = $conn->query($sql_count);
+$total_products = ($result_count->num_rows > 0) ? $result_count->fetch_assoc()['total_products'] : 0;
+
+// Tính số trang
+$total_pages = ceil($total_products / $products_per_page);
+
+// Xác định sản phẩm bắt đầu cho trang hiện tại
+$offset = ($current_page - 1) * $products_per_page;
+
+// Truy vấn sản phẩm cho trang hiện tại
+$sql_pagination = "SELECT * FROM products LIMIT $products_per_page OFFSET $offset";
+$result_pagination = $conn->query($sql_pagination);
 ?>
 
 
@@ -176,39 +196,69 @@ $result = $conn->query($sql);
                    
                 <div class="container-fluid">
     <h2 class="text-center my-4">Danh Sách Sản Phẩm</h2>
-    
-    <div class="row">
-    <?php
-// Kiểm tra nếu có sản phẩm
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        // Kiểm tra số lượng sản phẩm còn lại
-        $remain_product = $row['remain_product'];
-        $availability_class = ($remain_product > 0) ? 'available' : 'out-of-stock';
-        $availability_text = ($remain_product > 0) ? 'Còn hàng' : 'Hết hàng';
 
-        echo "<div class='col-md-4'>
-                <div class='product-card'>
-                    <img class='product-image' src='" . $row['image_url'] . "' alt='" . $row['name'] . "'>
-                    <div class='product-info'>
-                        <h5>" . $row['name'] . "</h5>
-                        <p>Giá: " . number_format($row['price'], 2) . " VND</p>
-                        <p>Mô tả: " . $row['description'] . "</p>
-                        <p><strong>Ngày tạo: </strong>" . $row['created_at'] . "</p>
-                        <p class='$availability_class'>$availability_text</p>
-                        <a href='edit_product.php?id=" . $row['id'] . "' class='btn btn-warning btn-sm'>Chỉnh sửa</a>
-                        <a href='delete_product.php?id=" . $row['id'] . "' class='btn btn-danger btn-sm'>Xóa</a>
+    <div class="row product-list">
+    <?php if ($result_pagination->num_rows > 0): ?>
+        <?php while ($product = $result_pagination->fetch_assoc()): ?>
+            <div class="col-md-4">
+                <div class="product-card">
+                    <img class="product-image" src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    <div class="product-info">
+                        <h5><?php echo htmlspecialchars($product['name']); ?></h5>
+                        <p>Giá: <?php echo number_format($product['price'], 2); ?> VND</p>
+                        <p>Mô tả: <?php echo htmlspecialchars($product['description']); ?></p>
+                        <p><strong>Ngày tạo: </strong><?php echo htmlspecialchars($product['created_at']); ?></p>
+                        <?php
+                        $remain_product = $product['remain_product'];
+                        $availability_class = ($remain_product > 0) ? 'available' : 'out-of-stock';
+                        $availability_text = ($remain_product > 0) ? 'Còn hàng' : 'Hết hàng';
+                        ?>
+                        <p class="<?php echo $availability_class; ?>"><?php echo $availability_text; ?></p>
+                        <a href="edit_product.php?id=<?php echo $product['id']; ?>" class="btn btn-warning btn-sm">Chỉnh sửa</a>
+                        <a href="delete_product.php?id=<?php echo $product['id']; ?>" class="btn btn-danger btn-sm">Xóa</a>
                     </div>
                 </div>
-            </div>";
-    }
-} else {
-    echo "<p>Không có sản phẩm nào.</p>";
-}
-?>
+            </div>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <p>Không có sản phẩm nào để hiển thị.</p>
+    <?php endif; ?>
+</div>
 
-    </div>
-</div> 
+<nav aria-label="Pagination">
+    <ul class="pagination justify-content-center">
+        <!-- Trang trước -->
+        <?php if ($current_page > 1): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $current_page - 1; ?>">← Trang trước</a>
+            </li>
+        <?php else: ?>
+            <li class="page-item disabled">
+                <span class="page-link">← Trang trước</span>
+            </li>
+        <?php endif; ?>
+
+        <!-- Các trang -->
+        <?php for ($page = 1; $page <= $total_pages; $page++): ?>
+            <li class="page-item <?php if ($page == $current_page) echo 'active'; ?>">
+                <a class="page-link" href="?page=<?php echo $page; ?>">
+                    <?php echo $page; ?>
+                </a>
+            </li>
+        <?php endfor; ?>
+
+        <!-- Trang sau -->
+        <?php if ($current_page < $total_pages): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $current_page + 1; ?>">Trang sau →</a>
+            </li>
+        <?php else: ?>
+            <li class="page-item disabled">
+                <span class="page-link">Trang sau →</span>
+            </li>
+        <?php endif; ?>
+    </ul>
+</nav>
                    
                 </div>
 

@@ -36,6 +36,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product_id']))
 // Truy vấn tất cả sản phẩm
 $sql = "SELECT * FROM products";
 $result = $conn->query($sql);
+
+$items_per_page = 3;
+
+// Xác định trang hiện tại (nếu không có thì mặc định là 1)
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$current_page = max(1, $current_page); // Không cho phép giá trị nhỏ hơn 1
+
+// Tính OFFSET
+$offset = ($current_page - 1) * $items_per_page;
+
+// Lấy tổng số sản phẩm
+$sql_count = "SELECT COUNT(*) AS total FROM products";
+$result_count = $conn->query($sql_count);
+$total_items = $result_count->fetch_assoc()['total'];
+
+// Tính tổng số trang
+$total_pages = ceil($total_items / $items_per_page);
+
+// Lấy danh sách sản phẩm cho trang hiện tại
+$sql_products = "SELECT * FROM products LIMIT $items_per_page OFFSET $offset";
+$result_pagination = $conn->query($sql_products);
 ?>
 
 <!DOCTYPE html>
@@ -207,62 +228,56 @@ $result = $conn->query($sql);
         </div>
     <?php endif; ?>
 
-    <div class="row" id="product-list">
-        <?php if ($result->num_rows > 0): ?>
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="col-md-4 mb-4">
-                    <div class="card product-card">
-                        <img src="<?= htmlspecialchars($row['image_url']); ?>" class="card-img-top" alt="<?= htmlspecialchars($row['name']); ?>">
-                        <div class="card-body">
-                            <h5 class="card-title"><?= htmlspecialchars($row['name']); ?></h5>
-                            <p class="card-text">Giá: <?= number_format($row['price'], 0, ',', '.'); ?> VND</p>
-                            <p class="card-text product-description"><?= htmlspecialchars($row['description']); ?></p>
-                            <p class="text-muted">Ngày tạo: <?= htmlspecialchars($row['created_at']); ?></p>
-                            <form action="" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
-                                <input type="hidden" name="delete_product_id" value="<?= $row['id']; ?>">
-                                <button type="submit" class="btn btn-danger">Xóa</button>
-                            </form>
+    <div class="product-list">
+    <div class="row">
+        <?php if ($result_pagination->num_rows > 0): ?>
+            <?php while ($product = $result_pagination->fetch_assoc()): ?>
+                <div class="col-md-4">
+                    <div class="product-card">
+                        <img class="product-image" src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        <div class="product-info">
+                            <h5><?php echo htmlspecialchars($product['name']); ?></h5>
+                            <p>Giá: <?php echo number_format($product['price'], 2); ?> VND</p>
+                            <a href="delete_product.php?id=<?php echo $product['id']; ?>" class="btn btn-danger btn-sm">Xóa</a>
                         </div>
                     </div>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <p class="text-center">Không có sản phẩm nào.</p>
+            <p>Không có sản phẩm nào để hiển thị.</p>
         <?php endif; ?>
     </div>
 </div>
 
+<nav aria-label="Pagination">
+    <ul class="pagination justify-content-center">
+        <?php if ($current_page > 1): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $current_page - 1; ?>">← Trang trước</a>
+            </li>
+        <?php else: ?>
+            <li class="page-item disabled">
+                <span class="page-link">← Trang trước</span>
+            </li>
+        <?php endif; ?>
 
+        <?php for ($page = 1; $page <= $total_pages; $page++): ?>
+            <li class="page-item <?php echo ($page == $current_page) ? 'active' : ''; ?>">
+                <a class="page-link" href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
+            </li>
+        <?php endfor; ?>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                </div>
+        <?php if ($current_page < $total_pages): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?php echo $current_page + 1; ?>">Trang sau →</a>
+            </li>
+        <?php else: ?>
+            <li class="page-item disabled">
+                <span class="page-link">Trang sau →</span>
+            </li>
+        <?php endif; ?>
+    </ul>
+</nav>
 
 </div>
 </div>
