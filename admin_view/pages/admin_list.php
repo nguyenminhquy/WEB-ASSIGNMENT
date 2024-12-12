@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -12,28 +11,29 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-$items_per_page = 10;
+$records_per_page = 5;
 
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+    $current_page = $_GET['page'];
+} else {
+    $current_page = 1;
+}
 
-$offset = ($current_page - 1) * $items_per_page;
+$offset = ($current_page - 1) * $records_per_page;
 
-$sql = "SELECT o.id, o.total_amount, o.payment_method, o.status, o.order_date, u.username
-        FROM orders o
-        JOIN users u ON o.user_id = u.id
-        ORDER BY o.order_date DESC
-        LIMIT $items_per_page OFFSET $offset";
-
+$sql = "SELECT id, username, email, address, phone, dob, created_at FROM users WHERE role = 'admin' ORDER BY created_at DESC LIMIT $offset, $records_per_page";
 $result = $conn->query($sql);
 
 if (!$result) {
     die("Truy vấn thất bại: " . $conn->error);
 }
 
-$sql_total = "SELECT COUNT(*) as total FROM orders o";
-$total_result = $conn->query($sql_total);
-$total_orders = $total_result->fetch_assoc()['total'];
-$total_pages = ceil($total_orders / $items_per_page); 
+$sql_total = "SELECT COUNT(*) AS total FROM users WHERE role = 'admin'";
+$result_total = $conn->query($sql_total);
+$row = $result_total->fetch_assoc();
+$total_records = $row['total'];
+
+$total_pages = ceil($total_records / $records_per_page);
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +44,6 @@ $total_pages = ceil($total_orders / $items_per_page);
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
 
-	<!-- title -->
 	<title>THỨC ĂN NHÀ MÌNH </title>
 
 	<!-- favicon -->
@@ -69,8 +68,8 @@ $total_pages = ceil($total_orders / $items_per_page);
 	<!-- responsive -->
 	<link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
     <link rel="stylesheet" href="../../admin_view/pages/css/product_list.css">
+    <link rel="stylesheet" href="../../admin_view/pages/css/user_list.css">
     <link rel="stylesheet" href="../../user_view/assets/css/responsive.css">
-    <link rel="stylesheet" href="./css/orders_list.css">
     <script src="/admin_view/pages/"></script>
     <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -88,7 +87,7 @@ $total_pages = ceil($total_orders / $items_per_page);
 <body>
 
 
-	<!-- header -->
+<!-- header -->
 <div class="top-header-area" id="sticker">
     <div class="container">
         <div class="row">
@@ -116,7 +115,7 @@ $total_pages = ceil($total_orders / $items_per_page);
                     <nav class="main-menu">
                         <ul>
                             <li class="current-list-item"><a href="./index.php">TRANG CHỦ</a></li>
-                          
+                        
                             <?php
                             if (isset($_SESSION['username'])) {
                                 $username = $_SESSION['username'];
@@ -162,21 +161,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 
 $_SESSION['last_activity'] = time();
 ?>
-
-<?php
-
-$session_timeout = 10 * 60;  
-
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
-    session_unset(); 
-    session_destroy(); 
-    header("Location: login.php");  
-    exit();
-}
-
-$_SESSION['last_activity'] = time();
-?>
-
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -221,85 +205,71 @@ $_SESSION['last_activity'] = time();
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-
-                <div class="container mt-5">
-        <h1 class="text-center mb-4">Danh Sách Đơn Hàng</h1>
+             
+                                <!-- Content -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Danh Sách Admin</h1>
 
         <?php if ($result->num_rows > 0): ?>
-            <table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th><i class="fas fa-hashtag"></i></th>
-            <th><i class="fas fa-user"></i> Tên Khách Hàng</th>
-            <th><i class="fas fa-money-bill-wave"></i> Tổng Tiền</th>
-            <th><i class="fas fa-credit-card"></i> Phương Thức Thanh Toán</th>
-            <th><i class="fas fa-exclamation-circle"></i> Trạng Thái</th>
-            <th><i class="fas fa-calendar-alt"></i> Ngày Đặt Hàng</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php while ($order = $result->fetch_assoc()): ?>
-            <tr>
-                <td><i class="fas fa-hashtag text-primary"></i> <?= htmlspecialchars($order['id']); ?></td>
-                <td><i class="fas fa-user text-success"></i> <?= htmlspecialchars($order['username']); ?></td>
-                <td><i class="fas fa-money-bill-wave text-warning"></i> <?= number_format($order['total_amount'], 0, ',', '.'); ?> VND</td>
-                <td><i class="fas fa-credit-card text-info"></i> <?= htmlspecialchars($order['payment_method']); ?></td>
-                <td>
-                    <?php
-                        $status = $order['status'];
-                        if ($status === 'Pending') {
-                            echo "<i class='fas fa-clock text-warning'></i> <span class='badge bg-warning'>Đang xử lý</span>";
-                        } elseif ($status === 'Completed') {
-                            echo "<i class='fas fa-check-circle text-success'></i> <span class='badge bg-success'>Hoàn thành</span>";
-                        } elseif ($status === 'Cancelled') {
-                            echo "<i class='fas fa-times-circle text-danger'></i> <span class='badge bg-danger'>Đã hủy</span>";
-                        } else {
-                            echo "<i class='fas fa-question-circle text-secondary'></i> <span class='badge bg-secondary'>Không xác định</span>";
-                        }
-                    ?>
-                </td>
-                <td><i class="fas fa-calendar-alt text-secondary"></i> <?= date("d/m/Y H:i:s", strtotime($order['order_date'])); ?></td>
-            </tr>
-        <?php endwhile; ?>
-    </tbody>
-</table>
-
+            <div class="table-container">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Tên Người Dùng</th>
+                            <th>Email</th>
+                            <th>Địa Chỉ</th>
+                            <th>Số Điện Thoại</th>
+                            <th>Ngày Sinh</th>
+                            <th>Ngày Tham Gia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($user = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td><i class="fas fa-hashtag text-primary"></i> <?= htmlspecialchars($user['id']); ?></td>
+                                <td><i class="fas fa-user text-success"></i> <?= htmlspecialchars($user['username']); ?></td>
+                                <td><i class="fas fa-envelope text-info"></i> <?= htmlspecialchars($user['email']); ?></td>
+                                <td><i class="fas fa-map-marker-alt text-warning"></i> <?= htmlspecialchars($user['address']); ?></td>
+                                <td><i class="fas fa-phone-alt text-success"></i> <?= htmlspecialchars($user['phone']); ?></td>
+                                <td><i class="fas fa-birthday-cake text-danger"></i> <?= htmlspecialchars($user['dob']); ?></td>
+                                <td><i class="fas fa-calendar-alt text-secondary"></i> <?= htmlspecialchars($user['created_at']); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php else: ?>
-            <p class="text-center">Không có đơn hàng nào.</p>
+            <p class="text-center">Không có admin nào trong hệ thống.</p>
         <?php endif; ?>
 
-        <div class="pagination-container text-center">
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                    <?php if ($current_page > 1): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?= $current_page - 1; ?>" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item <?= $current_page <= 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=1">Đầu</a>
+                </li>
+                <li class="page-item <?= $current_page <= 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=<?= $current_page - 1; ?>">Trước</a>
+                </li>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <li class="page-item <?= $i == $current_page ? 'active' : ''; ?>">
+                        <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+                <li class="page-item <?= $current_page >= $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=<?= $current_page + 1; ?>">Tiếp</a>
+                </li>
+                <li class="page-item <?= $current_page >= $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=<?= $total_pages; ?>">Cuối</a>
+                </li>
+            </ul>
+        </nav>
 
-                    <?php for ($page = 1; $page <= $total_pages; $page++): ?>
-                        <li class="page-item <?= $page == $current_page ? 'active' : ''; ?>">
-                            <a class="page-link" href="?page=<?= $page; ?>"><?= $page; ?></a>
-                        </li>
-                    <?php endfor; ?>
-
-                    <?php if ($current_page < $total_pages): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?= $current_page + 1; ?>" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </nav>
+        <div class="text-center mt-4">
+            <a href="index.php" class="btn btn-secondary">Quay Lại</a>
         </div>
     </div>
 
-
-
-                   
                 </div>
 
             </div>

@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kiểm tra nếu người dùng đã đăng nhập
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -9,7 +8,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -21,7 +19,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Tìm kiếm đơn hàng theo ID đơn hàng hoặc phương thức thanh toán
 $search_query = "";
 if (isset($_GET['search_order_id']) && !empty($_GET['search_order_id'])) {
     $search_query = "AND o.id = " . $_GET['search_order_id'];
@@ -30,7 +27,6 @@ if (isset($_GET['search_payment_method']) && !empty($_GET['search_payment_method
     $search_query .= " AND o.payment_method LIKE '%" . $_GET['search_payment_method'] . "%'";
 }
 
-// Lấy lịch sử đơn hàng của người dùng
 $sql_orders = "SELECT o.id, o.total_amount, o.payment_method, o.order_date 
                FROM orders o 
                WHERE o.user_id = ? $search_query
@@ -104,11 +100,18 @@ $result_orders = $stmt_orders->get_result();
 
  
 
-<!-- Hiển thị danh sách đơn hàng -->
-<?php
+    <?php
+$orders_per_page = 5;
+
+$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+$offset = ($current_page - 1) * $orders_per_page;
+
+$sql_orders = "SELECT * FROM orders LIMIT $orders_per_page OFFSET $offset";
+$result_orders = $conn->query($sql_orders);
+
 if ($result_orders->num_rows > 0) {
     while ($order = $result_orders->fetch_assoc()) {
-        // Hiển thị thông tin đơn hàng
         echo "<div class='card mb-4 shadow-lg rounded-lg overflow-hidden'>";
         echo "<div class='card-body bg-light'>";
         echo "<h5 class='card-title text-xl font-bold text-primary'>Đơn hàng #" . $order['id'] . "</h5>";
@@ -116,7 +119,6 @@ if ($result_orders->num_rows > 0) {
         echo "<p><strong>Phương thức thanh toán:</strong> " . $order['payment_method'] . "</p>";
         echo "<p><strong>Ngày đặt hàng:</strong> " . date("d/m/Y H:i:s", strtotime($order['order_date'])) . "</p>";
 
-        // Lấy các sản phẩm trong đơn hàng
         $order_id = $order['id'];
         $sql_order_items = "SELECT oi.product_id, oi.quantity, p.name, p.price 
                             FROM order_items oi 
@@ -127,10 +129,9 @@ if ($result_orders->num_rows > 0) {
         $stmt_order_items->execute();
         $result_order_items = $stmt_order_items->get_result();
 
-        
         if ($result_order_items->num_rows > 0) {
             echo "<h6 class='mt-4 font-semibold text-info'>Sản phẩm trong đơn hàng:</h6>";
-            echo "<ul class='list-unstyled space-y-4'>";  // Dùng space-y-4 để tạo khoảng cách giữa các mục sản phẩm
+            echo "<ul class='list-unstyled space-y-4'>";  
         
             while ($item = $result_order_items->fetch_assoc()) {
                 echo "<li class='flex justify-between items-center p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition duration-300 ease-in-out transform hover:scale-105'>";
@@ -144,12 +145,40 @@ if ($result_orders->num_rows > 0) {
             echo "<p class='text-danger font-medium'>Không có sản phẩm trong đơn hàng này.</p>";
         }
         
-        echo "</div>";  // Đóng div card-body
-        echo "</div>";  // Đóng div card
-        
+        echo "</div>";  
+        echo "</div>";  
+    }
+} else {
+    echo "<p class='text-danger'>Không có đơn hàng nào.</p>";
+}
+
+$sql_count = "SELECT COUNT(*) AS total_orders FROM orders";
+$result_count = $conn->query($sql_count);
+$row_count = $result_count->fetch_assoc();
+$total_orders = $row_count['total_orders'];
+
+$total_pages = ceil($total_orders / $orders_per_page);
+
+echo "<div class='pagination mt-4'>";
+if ($current_page > 1) {
+    echo "<a href='?page=" . ($current_page - 1) . "' class='btn btn-info'>Trước</a>";
+}
+
+for ($page = 1; $page <= $total_pages; $page++) {
+    if ($page == $current_page) {
+        echo "<span class='btn btn-secondary'>" . $page . "</span>";
+    } else {
+        echo "<a href='?page=" . $page . "' class='btn btn-outline-info'>" . $page . "</a>";
     }
 }
+
+if ($current_page < $total_pages) {
+    echo "<a href='?page=" . ($current_page + 1) . "' class='btn btn-info'>Tiếp theo</a>";
+}
+echo "</div>";
+
 ?>
+
 
 
 <p>
@@ -165,7 +194,6 @@ if ($result_orders->num_rows > 0) {
 </html>
 
 <?php
-// Đóng kết nối
 $stmt_orders->close();
 $conn->close();
 ?>

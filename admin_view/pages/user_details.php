@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,12 +8,10 @@ $dbname = "food_web";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Lấy thông tin người dùng
 $user_id = intval($_GET['id']);
 $sql_user = "SELECT * FROM users WHERE id = ?";
 $stmt_user = $conn->prepare($sql_user);
@@ -23,14 +20,12 @@ $stmt_user->execute();
 $user_result = $stmt_user->get_result();
 $user = $user_result->fetch_assoc();
 
-// Lấy lịch sử mua hàng
 $sql_orders = "SELECT id, total_amount, order_date FROM orders WHERE user_id = ? ORDER BY order_date DESC";
 $stmt_orders = $conn->prepare($sql_orders);
 $stmt_orders->bind_param("i", $user_id);
 $stmt_orders->execute();
 $order_result = $stmt_orders->get_result();
 
-// Lấy giỏ hàng hiện tại
 $sql_cart = "SELECT p.name, c.quantity, (p.price * c.quantity) AS total_price 
              FROM cart c 
              JOIN products p ON c.product_id = p.id 
@@ -96,49 +91,81 @@ $cart_result = $stmt_cart->get_result();
 
 
 <body>
-    	<!-- header -->
+    <!-- header -->
 <div class="top-header-area" id="sticker">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-sm-12 text-center">
-					<div class="main-menu-wrap">
-					                    <!-- logo -->
-										<div class="site-logo">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
     <a href="shop_user.php">
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
 
-						<!-- menu start -->
-						<nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-								
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
-						<!-- menu end -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end header -->
+                    <!-- logo -->
+                     <style>
+                        .site-logo img {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%;
+    object-fit: cover; 
+}
 
+                     </style>
 
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li class="current-list-item"><a href="./index.php">TRANG CHỦ</a></li>
+                        
+                            <?php
+                            if (isset($_SESSION['username'])) {
+                                $username = $_SESSION['username'];
+                                echo '<li class="nav-item">
+                                        <a class="nav-link" href="./profile.php">
+                                            <i class="bi bi-person-circle"></i> ' . htmlspecialchars($username) . '
+                                        </a>
+                                      </li>';
+                                echo '<li><a href="logout.php">ĐĂNG XUẤT</a></li>';
+                            } else {
+                                echo '<li><a href="./login.php">ĐĂNG NHẬP</a></li>';
+                                echo '<li><a href="./register.php">ĐĂNG KÍ</a></li>';
+                            }
+                            ?>
+
+                            <li>
+                                <div class="header-icons">
+                                    <a class="shopping-cart" href="./cart.php"><i class="fas fa-shopping-cart"></i></a>
+                                    <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                    <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                    <div class="mobile-menu"></div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end header -->
+<?php
+
+$session_timeout = 10 * 60;  
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_unset(); 
+    session_destroy(); 
+    header("Location: login.php");  
+    exit();
+}
+
+$_SESSION['last_activity'] = time();
+?>
+
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -146,7 +173,6 @@ $cart_result = $stmt_cart->get_result();
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -165,7 +191,6 @@ $cart_result = $stmt_cart->get_result();
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -197,15 +222,15 @@ $cart_result = $stmt_cart->get_result();
         <div class="card mb-4">
     <div class="card-body">
         <h3 class="card-title">
-            <i class="fas fa-user-circle me-2"></i> <!-- Icon người dùng -->
+            <i class="fas fa-user-circle me-2"></i> 
             <?= htmlspecialchars($user['username']); ?>
         </h3>
         <p>
-            <i class="fas fa-envelope me-2"></i> <!-- Icon email -->
+            <i class="fas fa-envelope me-2"></i> 
             <strong>Email:</strong> <?= htmlspecialchars($user['email']); ?>
         </p>
         <p>
-            <i class="fas fa-calendar-alt me-2"></i> <!-- Icon lịch -->
+            <i class="fas fa-calendar-alt me-2"></i> 
             <strong>Ngày Tạo:</strong> <?= date("d/m/Y", strtotime($user['created_at'])); ?>
         </p>
     </div>
@@ -284,6 +309,5 @@ $cart_result = $stmt_cart->get_result();
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>

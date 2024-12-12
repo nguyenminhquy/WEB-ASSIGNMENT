@@ -1,20 +1,16 @@
 <?php
-session_start();  // Bắt đầu phiên làm việc
-
-// Kết nối tới cơ sở dữ liệu
+session_start(); 
 $servername = "localhost";
-$username = "root";  // Tên đăng nhập CSDL
-$password = "";  // Mật khẩu CSDL
-$dbname = "food_web";  // Tên cơ sở dữ liệu
+$username = "root";  
+$password = "";  
+$dbname = "food_web"; 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Kiểm tra nếu người dùng đã gửi dữ liệu qua POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user = $_POST['username'];
     $pass = $_POST['password'];
@@ -27,35 +23,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Lấy thông tin người dùng
         $user_data = $result->fetch_assoc();
         
-        // Kiểm tra mật khẩu có khớp không (so với mật khẩu đã mã hóa trong CSDL)
         if (password_verify($pass, $user_data['password'])) {
            
             $_SESSION['user_id'] = $user_data['id'];
             $_SESSION['username'] = $user_data['username'];
             $_SESSION['role'] = $user_data['role'];
             
-            // Tạo một session mới để bảo mật hơn
             session_regenerate_id(true);
             
-            // Kiểm tra vai trò của người dùng
             if ($_SESSION['role'] == 'admin') {
-                // Nếu là admin, chuyển hướng đến trang quản trị
                 header("Location: ../../admin_view/pages/index.php");  
                 exit();
             } else {
-                // Nếu là customer, chuyển hướng đến trang khách hàng
                 header("Location: ./shop_user.php");  
                 exit();
             }
         } else {
-            // Mật khẩu sai
             $error_message = "Mật khẩu không đúng! - VUI LÒNG NHẬP LẠI MẬT KHẨU ";
         }
     } else {
-        // Tài khoản không tồn tại
         $error_message = "Tài khoản không tồn tại!";
     }
 
@@ -101,10 +89,7 @@ $conn->close();
 </head>
 <body>
 	
-
-   
 	<?php include '../component/header_login.php'; ?>
-
 
 <div class="login-hero">
 		<div class="container">
@@ -126,34 +111,33 @@ $conn->close();
 
 <style>
 .login-hero {
-    background-image: url('../assets/img/sunga.jpg'); /* Đường dẫn hình ảnh */
-    background-size: cover; /* Đảm bảo ảnh bao phủ toàn bộ phần tử */
-    background-position: center center; /* Căn chỉnh ảnh ở giữa */
-    background-repeat: no-repeat; /* Ngăn chặn việc lặp lại ảnh */
-    background-attachment: fixed; /* Làm cho hình nền cố định khi cuộn trang */
-    height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+    background-image: url('../assets/img/sunga.jpg'); 
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat; 
+    background-attachment: fixed; 
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white; /* Màu chữ trắng để dễ đọc trên nền tối */
+    color: white; 
 }
 
 .hero-text h1 {
-    font-size: 3rem; /* Tùy chỉnh kích thước chữ */
+    font-size: 3rem;
     font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Đổ bóng chữ để rõ ràng hơn */
-    margin: 0; /* Loại bỏ margin mặc định */
-    padding: 0; /* Loại bỏ padding mặc định */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); 
+    margin: 0; 
+    padding: 0; 
 }
-
 .hero-text-tablecell {
     display: inline-block;
-    vertical-align: middle; /* Giữ cho phần tử căn giữa theo chiều dọc */
+    vertical-align: middle;
 }
 
 @media (max-width: 768px) {
     .hero-text h1 {
-        font-size: 2rem; /* Giảm kích thước chữ trên màn hình nhỏ */
+        font-size: 2rem;
     }
 }
 
@@ -168,7 +152,6 @@ $conn->close();
                     <h3 class="fw-bold">Đăng Nhập</h3>
                 </div>
                 <div class="card-body p-5">
-                    <!-- Form đăng nhập -->
                     <form action="login.php" method="POST">
                         <div class="mb-4">
                             <label for="username" class="form-label fs-5">Tài Khoản</label>
@@ -186,15 +169,12 @@ $conn->close();
                         <button type="submit" class="btn btn-primary btn-lg w-100">Đăng Nhập</button>
                     </form>
 
-                    <!-- Tùy chọn đăng nhập qua Google và Facebook -->
                     <div class="my-4 text-center">
                         <p>Hoặc đăng nhập bằng</p>
                         <div class="d-flex justify-content-center">
-                            <!-- Đăng nhập qua Google -->
                             <a href="google_login.php" class="btn btn-outline-danger btn-lg mx-2 w-50">
                                 <i class="fab fa-google"></i> Google
                             </a>
-                            <!-- Đăng nhập qua Facebook -->
                             <a href="facebook_login.php" class="btn btn-outline-primary btn-lg mx-2 w-50">
                                 <i class="fab fa-facebook-f"></i> Facebook
                             </a>
@@ -209,17 +189,8 @@ $conn->close();
         </div>
     </div>
 </div>
-
-
-
-
-
 	<?php include '../component/footer.php'; ?>
 
-	
-	
-	
-	
 	<!-- jquery -->
 	<script src="../../user_view/assets/js/jquery-1.11.3.min.js"></script>
 	<!-- bootstrap -->

@@ -1,0 +1,91 @@
+/* Tùy chỉnh cho bảng */
+.table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+}
+
+.table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.table th {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.table td {
+    font-size: 14px;
+}
+
+/* Sử dụng icon cho các cột trong bảng */
+.table i {
+    margin-right: 8px;
+    font-size: 18px;
+    color: #6c757d; /* Màu icon mặc định */
+}
+
+/* Tùy chỉnh màu sắc của icon */
+.table i.fas.fa-user {
+    color: #007bff;
+}
+
+.table i.fas.fa-envelope {
+    color: #17a2b8;
+}
+
+.table i.fas.fa-map-marker-alt {
+    color: #28a745;
+}
+
+.table i.fas.fa-phone-alt {
+    color: #ffc107;
+}
+
+.table i.fas.fa-birthday-cake {
+    color: #e83e8c;
+}
+
+.table i.fas.fa-calendar-alt {
+    color: #6f42c1;
+}
+
+/* Tùy chỉnh hover hiệu ứng cho hàng */
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+/* Cải thiện kiểu hiển thị của bảng trên thiết bị di động */
+@media (max-width: 768px) {
+    .table thead {
+        display: none; /* Ẩn tiêu đề bảng trên màn hình nhỏ */
+    }
+    
+    .table, .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table td {
+        position: relative;
+        padding-left: 30%;
+    }
+
+    .table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: bold;
+        color: #6c757d;
+    }
+}

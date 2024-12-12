@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,16 +8,13 @@ $dbname = "food_web";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Lấy danh sách sản phẩm
 $sql_products = "SELECT id, name FROM products";
 $result_products = $conn->query($sql_products);
 
-// Lọc bình luận theo sản phẩm
 $product_id = isset($_GET['product_id']) ? intval($_GET['product_id']) : 0;
 $sql_comments = "SELECT c.id, c.comment_text, c.created_at, c.user_name, p.name AS product_name
                  FROM comments c
@@ -128,9 +124,6 @@ $result_comments = $conn->query($sql_comments);
 	</div>
 	<!-- end header -->
 
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -138,7 +131,6 @@ $result_comments = $conn->query($sql_comments);
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -157,7 +149,6 @@ $result_comments = $conn->query($sql_comments);
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -175,42 +166,13 @@ $result_comments = $conn->query($sql_comments);
 <?php include './sidebar.php'; ?>
 </div>
 
-
-
-    
-
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="container mt-5">
     <h1 class="text-center mb-4">Danh Sách Bình Luận Theo Sản Phẩm</h1>
 
-    <!-- Bộ lọc sản phẩm -->
     <form action="" method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-8">
@@ -229,7 +191,6 @@ $result_comments = $conn->query($sql_comments);
         </div>
     </form>
 
-    <!-- Hiển thị danh sách bình luận -->
     <?php if ($result_comments->num_rows > 0): ?>
         <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -285,7 +246,6 @@ $result_comments = $conn->query($sql_comments);
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>
 

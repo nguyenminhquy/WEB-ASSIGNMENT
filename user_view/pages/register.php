@@ -1,61 +1,57 @@
 <?php
-session_start();  // Bắt đầu phiên làm việc
-
-// Kết nối tới cơ sở dữ liệu
+session_start();  
 $servername = "localhost";
-$username = "root";  // Tên đăng nhập CSDL
-$password = "";  // Mật khẩu CSDL
-$dbname = "food_web";  // Tên cơ sở dữ liệu
+$username = "root"; 
+$password = "";  
+$dbname = "food_web";  
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Kiểm tra nếu người dùng đã gửi dữ liệu qua POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user = $_POST['username'];
     $pass = $_POST['password'];
-    $role = $_POST['role']; // Role có thể là 'customer' hoặc 'admin'
+    $role = $_POST['role']; 
 
-    // Kiểm tra xem username đã tồn tại chưa
-    $sql_check = "SELECT * FROM users WHERE username = ?";
-    if ($stmt_check = $conn->prepare($sql_check)) {
-        $stmt_check->bind_param('s', $user);
-        $stmt_check->execute();
-        $result_check = $stmt_check->get_result();
-
-        if ($result_check->num_rows > 0) {
-            $error_message = "Tài khoản đã tồn tại!";
-        } else {
-            
-            $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
-
-            // Lưu thông tin người dùng vào cơ sở dữ liệu
-            $sql_insert = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
-            if ($stmt_insert = $conn->prepare($sql_insert)) {
-                $stmt_insert->bind_param('sss', $user, $hashed_password, $role);
-                
-                if ($stmt_insert->execute()) {
-                    // Đăng ký thành công, chuyển hướng đến trang đăng nhập
-                    header("Location: login.php");
-                    exit();
-                } else {
-                    $error_message = "Lỗi khi đăng ký tài khoản!";
-                }
-                $stmt_insert->close();
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        
+        $user = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+        $pass = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+        $role = htmlspecialchars($_POST['role'], ENT_QUOTES, 'UTF-8');
+        
+        $sql_check = "SELECT * FROM users WHERE username = ?";
+        if ($stmt_check = $conn->prepare($sql_check)) {
+            $stmt_check->bind_param('s', $user);
+            $stmt_check->execute();
+            $result_check = $stmt_check->get_result();
+    
+            if ($result_check->num_rows > 0) {
+                $error_message = "Tài khoản đã tồn tại!";
             } else {
-                $error_message = "Lỗi khi chuẩn bị câu lệnh SQL để chèn dữ liệu!";
+                $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
+                $sql_insert = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+                if ($stmt_insert = $conn->prepare($sql_insert)) {
+                    $stmt_insert->bind_param('sss', $user, $hashed_password, $role);
+                    if ($stmt_insert->execute()) {
+                        header("Location: login.php");
+                        exit();
+                    } else {
+                        $error_message = "Lỗi khi đăng ký tài khoản!";
+                    }
+                    $stmt_insert->close();
+                } else {
+                    $error_message = "Lỗi khi chuẩn bị câu lệnh SQL để chèn dữ liệu!";
+                }
             }
+            $stmt_check->close();
+        } else {
+            $error_message = "Lỗi khi chuẩn bị câu lệnh SQL kiểm tra tên đăng nhập!";
         }
-
-        $stmt_check->close();
-    } else {
-        $error_message = "Lỗi khi chuẩn bị câu lệnh SQL kiểm tra tên đăng nhập!";
     }
-}
+}    
 
 $conn->close();
 ?>
@@ -125,7 +121,6 @@ $conn->close();
                     <h3>Đăng Ký Tài Khoản</h3>
                 </div>
                 <div class="card-body p-5">
-                    <!-- Form đăng ký -->
                     <form action="register.php" method="POST">
                         <div class="mb-3">
                             <label for="username" class="form-label">Tài Khoản</label>
@@ -173,7 +168,6 @@ $conn->close();
     </div>
 </div>
 
-<!-- Toast thông báo -->
 <?php if (isset($error_message)): ?>
     <div class="toast align-items-center text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
         <div class="d-flex">

@@ -1,42 +1,29 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";  
+$password = "";      
+$dbname = "food_web"; 
 
 // Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Lấy tổng số sản phẩm
 $sql_products = "SELECT COUNT(*) AS total_products FROM products";
 $result_products = $conn->query($sql_products);
 $total_products = ($result_products->num_rows > 0) ? $result_products->fetch_assoc()['total_products'] : 0;
 
-// Lấy tổng doanh thu
 $sql_sales = "SELECT SUM(price) AS total_sales FROM products";
 $result_sales = $conn->query($sql_sales);
 $total_sales = ($result_sales->num_rows > 0) ? $result_sales->fetch_assoc()['total_sales'] : 0;
 
-// Lấy user_id từ session (nếu người dùng đã đăng nhập)
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-$sql_latest_product = "SELECT * FROM products ORDER BY id DESC LIMIT 1";
-$result_latest = $conn->query($sql_latest_product);
 
-if ($result_latest->num_rows > 0) {
-    $latest_product = $result_latest->fetch_assoc();
-} else {
-    $latest_product = null;
-}
 ?>
 
 
@@ -92,49 +79,79 @@ if ($result_latest->num_rows > 0) {
 
 	<!-- header -->
 <div class="top-header-area" id="sticker">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-sm-12 text-center">
-					<div class="main-menu-wrap">
-					                    <!-- logo -->
-										<div class="site-logo">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
     <a href="shop_user.php">
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
 
+                    <!-- logo -->
+                     <style>
+                        .site-logo img {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%;
+    object-fit: cover; 
+                     </style>
 
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li class="current-list-item"><a href="./index.php">TRANG CHỦ</a></li>
+                          
 
+                            <!-- Đoạn PHP để hiển thị tên người dùng hoặc đăng nhập -->
+                            <?php
+                            if (isset($_SESSION['username'])) {
+                                $username = $_SESSION['username'];
+                                echo '<li class="nav-item">
+                                        <a class="nav-link" href="./profile.php">
+                                            <i class="bi bi-person-circle"></i> ' . htmlspecialchars($username) . '
+                                        </a>
+                                      </li>';
+                                echo '<li><a href="logout.php">ĐĂNG XUẤT</a></li>';
+                            } else {
+                                echo '<li><a href="./login.php">ĐĂNG NHẬP</a></li>';
+                                echo '<li><a href="./register.php">ĐĂNG KÍ</a></li>';
+                            }
+                            ?>
 
+                            <li>
+                                <div class="header-icons">
+                                    <a class="shopping-cart" href="./cart.php"><i class="fas fa-shopping-cart"></i></a>
+                                    <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                    <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                    <div class="mobile-menu"></div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end header -->
+<?php
 
+$session_timeout = 10 * 60;  
 
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_unset(); 
+    session_destroy(); 
+    header("Location: login.php");  
+    exit();
+}
 
-						<!-- menu start -->
-						<nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-								
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
-						<!-- menu end -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end header -->
+$_SESSION['last_activity'] = time();
+?>
+
 
 
 <!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
@@ -251,36 +268,46 @@ if ($result_latest->num_rows > 0) {
 
                 <!-- Recent Activity -->
                 <div class="card mt-4">
-    <div class="card-header bg-primary text-white">
-        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
-    </div>
-    <div class="card-body">
-        <ul class="list-group">
-            <?php
-            // Truy vấn sản phẩm mới nhất
-            $sql_latest_product = "SELECT * FROM products ORDER BY id DESC LIMIT 1";
-            $result_latest = $conn->query($sql_latest_product);
-
-            if ($result_latest->num_rows > 0) {
-                $latest_product = $result_latest->fetch_assoc();
-                echo '<li class="list-group-item">Đã thêm sản phẩm mới: <strong>' . htmlspecialchars($latest_product['name']) . '</strong></li>';
-            } else {
-                echo '<li class="list-group-item">Chưa có sản phẩm mới được thêm.</li>';
-            }
-            $sql_latest_price_update = "SELECT * FROM products WHERE updated_at IS NOT NULL ORDER BY updated_at DESC LIMIT 1";
-            $result_latest_price_update = $conn->query($sql_latest_price_update);
-
-            if ($result_latest_price_update->num_rows > 0) {
-                $latest_price_update = $result_latest_price_update->fetch_assoc();
-                echo '<li class="list-group-item">Đã cập nhật giá cho món: <strong>' . htmlspecialchars($latest_price_update['name']) . '</strong> (Giá mới: ' . htmlspecialchars($latest_price_update['price']) . ' VND)</li>';
-            } else {
-                echo '<li class="list-group-item">Chưa có sản phẩm nào được cập nhật giá.</li>';
-            }
-            // Có thể thêm các hoạt động khác như cập nhật giá, đơn hàng mới...
-            ?>
-        </ul>
-    </div>
-</div>
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
+                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
+                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
+                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
+                        </ul>
+                    </div>
+                </div>
+                  <!-- Recent Activity -->
+                  <div class="card mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
+                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
+                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
+                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
+                        </ul>
+                    </div>
+                </div>
+                  <!-- Recent Activity -->
+                  <div class="card mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-clipboard-list"></i> Hoạt Động Mới Nhất
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">Đã thêm sản phẩm mới: <strong>Món Gà Rán</strong></li>
+                            <li class="list-group-item">Đã cập nhật giá cho món <strong>Pizza Margherita</strong></li>
+                            <li class="list-group-item">Đơn hàng mới đã được tạo: <strong>Đơn hàng #1243</strong></li>
+                            <li class="list-group-item">Món ăn <strong>Sushi</strong> đã hết hàng.</li>
+                        </ul>
+                    </div>
+                </div>
                 
             </div>
         </div>

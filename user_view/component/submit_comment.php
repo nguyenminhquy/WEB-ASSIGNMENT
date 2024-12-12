@@ -2,21 +2,17 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php'); // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
+    header('Location: login.php'); 
     exit();
 }
-
-// Lấy dữ liệu từ form
 $product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
 $comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
 
-// Kiểm tra dữ liệu hợp lệ
 if (empty($comment)) {
     echo 'Bình luận không được để trống!';
     exit();
 }
 
-// Kết nối cơ sở dữ liệu
 $host = 'localhost';
 $db = 'food_web';
 $user = 'root';
@@ -31,10 +27,8 @@ try {
     exit;
 }
 
-// Lấy tên người dùng từ session
 $username = $_SESSION['username'];
 
-// Thêm bình luận vào cơ sở dữ liệu
 $query = "INSERT INTO comments (product_id, username, comment, created_at) 
           VALUES (:product_id, :username, :comment, NOW())";
 $stmt = $pdo->prepare($query);
@@ -43,7 +37,6 @@ $stmt->bindParam(':username', $username, PDO::PARAM_STR);
 $stmt->bindParam(':comment', $comment, PDO::PARAM_STR);
 $stmt->execute();
 
-// Sau khi thêm thành công, chuyển hướng lại trang chi tiết sản phẩm
 header("Location: ./product_detail.php?id=" . $product_id);
 exit();
 ?>

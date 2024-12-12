@@ -30,6 +30,7 @@
 	<link rel="stylesheet" href="./user_view/assets/css/main.css">
 	<!-- responsive -->
 	<link rel="stylesheet" href="./user_view/assets/css/responsive.css">
+    <link rel="stylesheet" href="./assets/css/contact.css">
 
 </head>
 <body>
@@ -52,9 +53,10 @@
                     <!-- logo -->
                      <style>
                         .site-logo img {
-    width: 100px; 
-    border-radius: 50%; 
-    object-fit: cover;
+    width: 100px; /* Đặt kích thước logo (có thể thay đổi tùy ý) */
+    height: 100px; /* Đảm bảo chiều cao và chiều rộng đều nhau */
+    border-radius: 50%; /* Chuyển logo thành hình tròn */
+    object-fit: cover; /* Đảm bảo hình ảnh không bị méo khi thay đổi kích thước */
 }
 
                      </style>
@@ -87,7 +89,30 @@
 	<!-- end header -->
 
 	<?php include './user_view/component/hero_area.php'; ?>
-	<?php include './user_view/component/service.php'; ?>
+    <div class="container2">
+    <h1>Thông tin liên lạc - Cửa Hàng</h1>
+    
+    <div class="contact-info">
+        <h2>Thông tin cửa hàng:</h2>
+        <p><i class="fas fa-map-marker-alt"></i> <strong>Địa chỉ:</strong> 123 Đường XYZ, Quận ABC, Thành phố HCM</p>
+        <p><i class="fas fa-phone"></i> <strong>Số điện thoại:</strong> (028) 1234 5678</p>
+        <p><i class="fas fa-envelope"></i> <strong>Email:</strong> lienhe@cua-hang.com</p>
+        <p><i class="fas fa-clock"></i> <strong>Giờ mở cửa:</strong> 9:00 AM - 6:00 PM (Tất cả các ngày trong tuần)</p>
+    </div>
+    
+    <!-- Form liên hệ -->
+    <div class="contact-form">
+        <h2>Liên hệ với chúng tôi</h2>
+        <form action="submit_contact_form.php" method="POST">
+            <input type="text" name="name" placeholder="Tên của bạn" required>
+            <input type="email" name="email" placeholder="Email của bạn" required>
+            <textarea name="message" placeholder="Lời nhắn của bạn" rows="4" required></textarea>
+            <button type="submit"><i class="fas fa-paper-plane"></i> Gửi thông tin</button>
+        </form>
+    </div>
+</div>
+
+   
 	
 	<?php include './user_view/component/footer.php'; ?>
 

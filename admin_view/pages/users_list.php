@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,12 +8,10 @@ $dbname = "food_web";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Truy vấn danh sách người dùng
 $sql = "SELECT id, username FROM users";
 $result = $conn->query($sql);
 ?>
@@ -118,9 +115,6 @@ $result = $conn->query($sql);
 	</div>
 	<!-- end header -->
 
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -128,7 +122,6 @@ $result = $conn->query($sql);
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -147,7 +140,6 @@ $result = $conn->query($sql);
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -186,11 +178,8 @@ $result = $conn->query($sql);
     </div>
 </form>
 
-
-    <!-- Danh sách người dùng -->
     <div class="list-group user-list">
         <?php
-        // Lọc danh sách người dùng dựa trên từ khóa tìm kiếm
         $search = isset($_GET['search']) ? $_GET['search'] : '';
         $sql = "SELECT * FROM users WHERE username LIKE ?";
         $stmt = $conn->prepare($sql);
@@ -211,10 +200,6 @@ $result = $conn->query($sql);
     </div>
 </div>
 
-
-
-
-                   
                 </div>
 
             </div>
@@ -230,6 +215,5 @@ $result = $conn->query($sql);
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>

@@ -1,24 +1,21 @@
 <?php
 session_start();
 
-// Kiểm tra nếu người dùng đã đăng nhập
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
-$payment_method = $_POST['payment_method'] ?? '';  // Nếu không có, sẽ trả về giá trị rỗng
+$payment_method = $_POST['payment_method'] ?? '';  
 $total_amount = 0;
 
-// Kiểm tra phương thức thanh toán
 if (empty($payment_method)) {
     $_SESSION['error'] = "Vui lòng chọn phương thức thanh toán!";
     header("Location: checkout.php");
     exit();
 }
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -30,7 +27,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Tính tổng tiền từ giỏ hàng
 $sql_cart_total = "SELECT SUM(p.price * c.quantity) AS total 
                    FROM cart c 
                    JOIN products p ON c.product_id = p.id 
@@ -46,24 +42,20 @@ if ($row = $result_cart_total->fetch_assoc()) {
 
 $stmt_cart_total->close();
 
-// Kiểm tra nếu giỏ hàng trống
 if ($total_amount == 0) {
     $_SESSION['error'] = "Giỏ hàng của bạn không có sản phẩm.";
     header("Location: checkout.php");
     exit();
 }
 
-// Lưu thông tin thanh toán vào bảng đơn hàng
 $sql_insert_order = "INSERT INTO orders (user_id, total_amount, payment_method, order_date) 
                      VALUES (?, ?, ?, NOW())";
 $stmt_insert_order = $conn->prepare($sql_insert_order);
 $stmt_insert_order->bind_param('iis', $user_id, $total_amount, $payment_method);
 $stmt_insert_order->execute();
 
-// Lấy ID đơn hàng vừa tạo
 $order_id = $stmt_insert_order->insert_id;
 
-// Chuyển các sản phẩm từ giỏ hàng sang đơn hàng
 $sql_cart_items = "SELECT product_id, quantity FROM cart WHERE user_id = ?";
 $stmt_cart_items = $conn->prepare($sql_cart_items);
 $stmt_cart_items->bind_param('i', $user_id);
@@ -71,7 +63,6 @@ $stmt_cart_items->execute();
 $result_cart_items = $stmt_cart_items->get_result();
 
 while ($row = $result_cart_items->fetch_assoc()) {
-    // Thêm sản phẩm vào bảng order_items
     $sql_insert_item = "INSERT INTO order_items (order_id, product_id, quantity) 
                         VALUES (?, ?, ?)";
     $stmt_insert_item = $conn->prepare($sql_insert_item);
@@ -81,7 +72,6 @@ while ($row = $result_cart_items->fetch_assoc()) {
 
 $stmt_insert_item->close();
 
-// Xóa giỏ hàng sau khi thanh toán
 $sql_delete_cart = "DELETE FROM cart WHERE user_id = ?";
 $stmt_delete_cart = $conn->prepare($sql_delete_cart);
 $stmt_delete_cart->bind_param('i', $user_id);
@@ -150,9 +140,7 @@ $_SESSION['success'] = "Thanh toán thành công! Đơn hàng của bạn đã �
     </div>
 </div>
 
-<!-- Nội dung của trang -->
 <div class="container mt-5">
-    <!-- Hiển thị thông báo thành công -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success transition-all duration-300 ease-in-out transform hover:scale-105" role="alert">
             <i class="fas fa-check-circle"></i> <?php echo $_SESSION['success']; ?>
@@ -160,7 +148,6 @@ $_SESSION['success'] = "Thanh toán thành công! Đơn hàng của bạn đã �
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
-    <!-- Hiển thị thông báo lỗi -->
     <?php if (isset($_SESSION['error'])): ?>
         <div class="alert alert-danger transition-all duration-300 ease-in-out transform hover:scale-105" role="alert">
             <i class="fas fa-exclamation-circle"></i> <?php echo $_SESSION['error']; ?>
@@ -168,11 +155,9 @@ $_SESSION['success'] = "Thanh toán thành công! Đơn hàng của bạn đã �
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
-    <!-- Nội dung chính -->
     <div class="text-center mt-5">
         <p class="text-lg text-gray-700">Cảm ơn bạn đã mua sắm tại cửa hàng của chúng tôi. Đơn hàng của bạn sẽ được xử lý trong thời gian sớm nhất.</p>
         
-        <!-- Các nút điều hướng -->
         <div class="mt-4 space-x-4">
             <a href="./order_history.php" class="btn btn-primary px-6 py-3 bg-blue-500 text-white rounded-full transition-colors hover:bg-blue-600 focus:outline-none">
                 <i class="fas fa-history mr-2"></i> Xem lịch sử đơn hàng

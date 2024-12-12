@@ -1,7 +1,5 @@
 <?php
 session_start();
-
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,17 +7,22 @@ $dbname = "food_web";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
-
-// Truy vấn đơn hàng "Pending" và lấy username từ bảng users
+$orders_per_page = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $orders_per_page;
+$sql_count = "SELECT COUNT(*) AS total_orders FROM orders WHERE status = 'Pending'";
+$result_count = $conn->query($sql_count);
+$total_orders = $result_count->fetch_assoc()['total_orders'];
+$total_pages = ceil($total_orders / $orders_per_page);
 $sql = "SELECT o.id, o.total_amount, o.payment_method, o.status, o.order_date, u.username
         FROM orders o
         JOIN users u ON o.user_id = u.id
         WHERE o.status = 'Pending'
-        ORDER BY o.order_date DESC";
+        ORDER BY o.order_date DESC
+        LIMIT $orders_per_page OFFSET $offset";
 
 $result = $conn->query($sql);
 
@@ -84,53 +87,77 @@ if (!$result) {
 
 	<!-- header -->
 <div class="top-header-area" id="sticker">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-sm-12 text-center">
-					<div class="main-menu-wrap">
-					                    <!-- logo -->
-										<div class="site-logo">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
     <a href="shop_user.php">
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
 
+                    <!-- logo -->
+                     <style>
+                        .site-logo img {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+}
 
+                     </style>
 
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li class="current-list-item"><a href="./index.php">TRANG CHỦ</a></li>
+                            <?php
+                            if (isset($_SESSION['username'])) {
+                                $username = $_SESSION['username'];
+                                echo '<li class="nav-item">
+                                        <a class="nav-link" href="./profile.php">
+                                            <i class="bi bi-person-circle"></i> ' . htmlspecialchars($username) . '
+                                        </a>
+                                      </li>';
+                                echo '<li><a href="logout.php">ĐĂNG XUẤT</a></li>';
+                            } else {
+                                echo '<li><a href="./login.php">ĐĂNG NHẬP</a></li>';
+                                echo '<li><a href="./register.php">ĐĂNG KÍ</a></li>';
+                            }
+                            ?>
 
+                            <li>
+                                <div class="header-icons">
+                                    <a class="shopping-cart" href="./cart.php"><i class="fas fa-shopping-cart"></i></a>
+                                    <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                    <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                    <div class="mobile-menu"></div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end header -->
+<?php
 
+$session_timeout = 10 * 60;  
 
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_unset(); 
+    session_destroy(); 
+    header("Location: login.php");  
+    exit();
+}
 
-						<!-- menu start -->
-						<nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-								
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
-						<!-- menu end -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end header -->
-
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
+$_SESSION['last_activity'] = time();
+?>
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -138,7 +165,6 @@ if (!$result) {
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -157,7 +183,6 @@ if (!$result) {
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -174,21 +199,10 @@ if (!$result) {
 <div class="col-md-3 bg-light p-4">
 <?php include './sidebar.php'; ?>
 </div>
-
-
-
-    
-
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
                
-
-
-
-
-
-
                 <div class="container mt-5">
     <h1 class="text-center mb-4">Đơn Hàng Đang Chờ Xử Lý</h1>
     
@@ -208,36 +222,53 @@ if (!$result) {
                 <tbody>
                     <?php while ($order = $result->fetch_assoc()): ?>
                         <tr>
-    <td>
-        <i class="fas fa-hashtag text-primary"></i> 
-        <?= htmlspecialchars($order['id']); ?>
-    </td>
-    <td>
-        <i class="fas fa-user text-success"></i> 
-        <?= htmlspecialchars($order['username']); ?>
-    </td>
-    <td>
-        <i class="fas fa-money-bill-wave text-warning"></i> 
-        <?= number_format($order['total_amount'], 0, ',', '.'); ?> VND
-    </td>
-    <td>
-        <i class="fas fa-credit-card text-info"></i> 
-        <?= htmlspecialchars($order['payment_method']); ?>
-    </td>
-    <td>
-        <i class="fas fa-spinner text-danger"></i> 
-        <span class="badge badge-pending">Đang xử lý</span>
-    </td>
-    <td>
-        <i class="fas fa-calendar-alt text-secondary"></i> 
-        <?= date("d/m/Y H:i:s", strtotime($order['order_date'])); ?>
-    </td>
-</tr>
-
+                            <td>
+                                <i class="fas fa-hashtag text-primary"></i> 
+                                <?= htmlspecialchars($order['id']); ?>
+                            </td>
+                            <td>
+                                <i class="fas fa-user text-success"></i> 
+                                <?= htmlspecialchars($order['username']); ?>
+                            </td>
+                            <td>
+                                <i class="fas fa-money-bill-wave text-warning"></i> 
+                                <?= number_format($order['total_amount'], 0, ',', '.'); ?> VND
+                            </td>
+                            <td>
+                                <i class="fas fa-credit-card text-info"></i> 
+                                <?= htmlspecialchars($order['payment_method']); ?>
+                            </td>
+                            <td>
+                                <i class="fas fa-spinner text-danger"></i> 
+                                <span class="badge badge-pending">Đang xử lý</span>
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar-alt text-secondary"></i> 
+                                <?= date("d/m/Y H:i:s", strtotime($order['order_date'])); ?>
+                            </td>
+                        </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
+
+        <div class="text-center mt-4">
+            <ul class="pagination">
+                <li class="page-item <?= $page == 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=1"> Trang Đầu</a>
+                </li>
+                <li class="page-item <?= $page == 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=<?= $page - 1; ?>">Trang Trước</a>
+                </li>
+                <li class="page-item <?= $page == $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=<?= $page + 1; ?>">Trang Tiếp</a>
+                </li>
+                <li class="page-item <?= $page == $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="?page=<?= $total_pages; ?>">Trang Cuối</a>
+                </li>
+            </ul>
+        </div>
+        
     <?php else: ?>
         <p class="text-center">Không có đơn hàng nào đang chờ xử lý.</p>
     <?php endif; ?>
@@ -247,24 +278,6 @@ if (!$result) {
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                   
                 </div>
 
             </div>
@@ -280,7 +293,6 @@ if (!$result) {
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>
 

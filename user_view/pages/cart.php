@@ -1,17 +1,14 @@
 <?php
-// Kết nối cơ sở dữ liệu
 $host = 'localhost';
 $db = 'food_web';
 $user = 'root';
 $pass = '';
 $conn = new mysqli($host, $user, $pass, $db);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Kiểm tra nếu người dùng chưa đăng nhập
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -19,7 +16,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 $user_id = $_SESSION['user_id'];
 
-// Xử lý tăng, giảm số lượng sản phẩm
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $product_id = $_POST['product_id'];
     $quantity = $_POST['quantity'];
@@ -30,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $quantity--;
     }
 
-    // Cập nhật số lượng sản phẩm trong giỏ hàng
     $sql = "UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('iii', $quantity, $user_id, $product_id);
@@ -39,11 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     exit();
 }
 
-// Xử lý xóa sản phẩm khỏi giỏ hàng
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_product'])) {
     $product_id = $_POST['product_id'];
 
-    // Xóa sản phẩm khỏi giỏ hàng
     $sql = "DELETE FROM cart WHERE user_id = ? AND product_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ii', $user_id, $product_id);
@@ -52,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_product'])) {
     exit();
 }
 
-// Lấy danh sách sản phẩm trong giỏ hàng của người dùng
 $sql = "SELECT p.id, p.name, p.price, c.quantity, (p.price * c.quantity) AS total_price 
         FROM cart c
         JOIN products p ON c.product_id = p.id
@@ -62,7 +54,6 @@ $stmt->bind_param('i', $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Tính tổng tiền của giỏ hàng
 $total_cart_value = 0;
 $cart_items = [];
 
@@ -71,7 +62,6 @@ while ($row = $result->fetch_assoc()) {
     $total_cart_value += $row['total_price'];
 }
 
-// Đóng kết nối
 $stmt->close();
 $conn->close();
 ?>
@@ -136,7 +126,6 @@ $conn->close();
     <div class="container mt-5">
     <h2>Giỏ Hàng</h2>
 
-    <!-- Hiển thị giỏ hàng -->
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -154,23 +143,18 @@ $conn->close();
                         <td><?= htmlspecialchars($item['name']); ?></td>
                         <td><?= number_format($item['price'], 0, ',', '.'); ?> VNĐ</td>
                         <td>
-                            <!-- Tăng/Giảm số lượng -->
                             <form action="cart.php" method="POST" style="display:inline;" class="cart-form">
                                 <input type="hidden" name="product_id" value="<?= $item['id']; ?>">
                                 
-                                <!-- Nút giảm số lượng -->
                                 <button type="submit" name="action" value="decrease" class="btn btn-warning btn-sm">-</button>
                                 
-                                <!-- Số lượng -->
                                 <input type="number" name="quantity" value="<?= $item['quantity']; ?>" min="1" class="form-control d-inline cart-input" style="width: 60px; display:inline-block;" required>
                                 
-                                <!-- Nút tăng số lượng -->
                                 <button type="submit" name="action" value="increase" class="btn btn-success btn-sm">+</button>
                             </form>
                         </td>
                         <td><?= number_format($item['total_price'], 0, ',', '.'); ?> VNĐ</td>
                         <td>
-                            <!-- Form xóa sản phẩm -->
                             <form action="cart.php" method="POST" style="display:inline;">
                                 <input type="hidden" name="product_id" value="<?= $item['id']; ?>">
                                 <button type="submit" name="remove_product" class="btn btn-danger btn-sm">Xóa</button>
@@ -186,12 +170,10 @@ $conn->close();
         </tbody>
     </table>
 
-    <!-- Hiển thị tổng tiền -->
     <div class="text-right">
         <h4>Tổng Tiền: <?= number_format($total_cart_value, 0, ',', '.'); ?> VNĐ</h4>
     </div>
 
-    <!-- Nút thanh toán -->
     <div class="text-right mt-4">
         <a href="checkout.php" class="btn btn-success btn-lg">THANH TOÁN</a>
         <a href="shop_user.php" class="btn btn-outline-success btn-lg">TIẾP TỤC MUA HÀNG</a>
@@ -203,4 +185,3 @@ $conn->close();
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

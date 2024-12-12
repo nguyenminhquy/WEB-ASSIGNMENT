@@ -59,3 +59,10 @@ tbody td {
     overflow: hidden;
     background-color: #ffffff;
 }
+.logo-circle {
+    width: 100px; /* Bạn có thể thay đổi kích thước logo ở đây */
+    height: 100px; /* Đảm bảo chiều cao và chiều rộng đều như nhau */
+    border-radius: 50%; /* Để tạo hình tròn */
+    object-fit: cover; /* Đảm bảo ảnh không bị méo */
+    border: 2px solid #fff; /* Nếu muốn thêm viền trắng xung quanh logo */
+}

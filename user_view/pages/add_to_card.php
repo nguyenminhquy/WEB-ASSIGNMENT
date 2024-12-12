@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-$message = ''; // Biến chứa thông báo
-
+$message = ''; 
 if (!isset($_SESSION['user_id'])) {
     $message = "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!";
     exit();
@@ -176,18 +175,14 @@ $conn->close();
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="container my-5">
-            <!-- Box chứa các nút và thông báo -->
             <div class="box-container p-5 rounded shadow-lg bg-light">
 
-                <!-- Animation Hover hiệu ứng khi rê chuột vào nút -->
                 <div class="text-center mt-3">
                     <p class="lead display-4">Khám phá thêm các sản phẩm tuyệt vời ngay bây giờ!</p>
                     <a href="./shop_user.php" class="btn btn-dark btn-lg animated fadeInUp" role="button">
                         <i class="fa fa-arrow-right"></i> TIẾP TỤC MUA SẮM 
                     </a>
                 </div> 
-
-              <!-- Hiển thị thông báo nếu có message -->
 <?php if ($message): ?>
     <div class="alert alert-success alert-dismissible fade show my-3 animate__animated animate__fadeInUp" role="alert">
         <?= htmlspecialchars($message); ?>
@@ -197,25 +192,19 @@ $conn->close();
     </div>
 <?php endif; ?>
 
-
-              <!-- Các nút bấm và tính năng -->
 <div class="text-center mt-4 d-flex justify-content-center align-items-stretch">
-    <!-- Tiếp tục mua hàng -->
     <a href="./shop_user.php" class="btn btn-primary btn-lg mx-3 my-3 flex-fill" role="button">
         <i class="fa fa-shopping-cart"></i> Tiếp Tục Mua Hàng
     </a>
     
-    <!-- Xem giỏ hàng -->
     <a href="./cart.php" class="btn btn-warning btn-lg mx-3 my-3 flex-fill" role="button">
         <i class="fa fa-cart-plus"></i> Xem Giỏ Hàng
     </a>
 
-    <!-- Liên hệ hỗ trợ -->
     <a href="contact.php" class="btn btn-info btn-lg mx-3 my-3 flex-fill" role="button">
         <i class="fa fa-headset"></i> Liên Hệ Hỗ Trợ
     </a>
 
-    <!-- Khuyến mãi -->
     <a href="promo.php" class="btn btn-success btn-lg mx-3 my-3 flex-fill" role="button">
         <i class="fa fa-gift"></i> Khuyến Mãi Hấp Dẫn
     </a>
@@ -229,9 +218,7 @@ $conn->close();
 
     <?php include '../component/footer.php'; ?>
    
-<!-- Nhúng JavaScript vào cuối phần <body> -->
 <script>
-    // Sử dụng jQuery để thêm hiệu ứng fadeOut khi đóng
     $('.alert .close').on('click', function() {
         $(this).parent('.alert').addClass('animate__fadeOut').fadeOut(500);
     });
@@ -240,13 +227,12 @@ $conn->close();
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-    <!-- Thêm thư viện Font Awesome cho các icon -->
+
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 
-<!-- Thêm thư viện hiệu ứng hover và animations -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></script>
 
-<!-- Sử dụng thư viện Bootstrap và jQuery để điều khiển thông báo và hiệu ứng -->
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

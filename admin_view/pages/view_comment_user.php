@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,16 +8,13 @@ $dbname = "food_web";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Lấy danh sách người dùng
 $sql_users = "SELECT DISTINCT user_name FROM comments";
 $result_users = $conn->query($sql_users);
 
-// Lọc bình luận theo người dùng
 $user_name = isset($_GET['user_name']) ? $conn->real_escape_string($_GET['user_name']) : '';
 $sql_comments = "SELECT c.id, c.comment_text, c.created_at, c.user_name, p.name AS product_name
                  FROM comments c
@@ -44,7 +40,6 @@ $result_comments = $conn->query($sql_comments);
 <div class="container mt-5">
     <h1 class="text-center mb-4">Danh Sách Bình Luận Theo Người Dùng</h1>
 
-    <!-- Bộ lọc người dùng -->
     <form action="" method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-8">
@@ -63,7 +58,6 @@ $result_comments = $conn->query($sql_comments);
         </div>
     </form>
 
-    <!-- Hiển thị danh sách bình luận -->
     <?php if ($result_comments->num_rows > 0): ?>
         <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -102,7 +96,6 @@ $result_comments = $conn->query($sql_comments);
         <a href="./index.php" class="btn btn-primary">Quay Lại Dashboard</a>
     </div>
 </div>
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

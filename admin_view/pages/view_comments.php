@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,12 +8,10 @@ $dbname = "food_web";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Truy vấn tất cả bình luận
 $sql = "SELECT c.id, c.comment_text, c.created_at, c.user_name, p.name AS product_name
         FROM comments c
         JOIN products p ON c.product_id = p.id
@@ -93,11 +90,6 @@ if (!$result) {
 </div>
 
 
-
-
-
-
-
 						<!-- menu start -->
 						<nav class="main-menu">
 							<ul>
@@ -125,9 +117,6 @@ if (!$result) {
 	</div>
 	<!-- end header -->
 
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -135,7 +124,6 @@ if (!$result) {
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -154,7 +142,6 @@ if (!$result) {
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -171,17 +158,9 @@ if (!$result) {
 <div class="col-md-3 bg-light p-4">
 <?php include './sidebar.php'; ?>
 </div>
-
-
-
-    
-
             <!-- Main Content -->
             <div class="col-md-9 p-4">
                 <div class="row">
-
-
-
 
                 <div class="container mt-5">
         <h1 class="text-center mb-4">Danh Sách Bình Luận</h1>
@@ -236,6 +215,5 @@ if (!$result) {
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>

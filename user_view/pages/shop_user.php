@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$message = ''; // Biến chứa thông báo
+$message = ''; 
 
 if (!isset($_SESSION['user_id'])) {
     $message = "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!";
@@ -91,37 +91,35 @@ $conn->close();
 
 <style>
 .shop-user-hero {
-    background-image: url('../assets/img/breadcrumb-bg.jpg'); /* Đường dẫn hình ảnh */
-    background-size: cover; /* Đảm bảo ảnh bao phủ toàn bộ phần tử */
-    background-position: center center; /* Căn chỉnh ảnh ở giữa */
-    background-repeat: no-repeat; /* Ngăn chặn việc lặp lại ảnh */
-    background-attachment: fixed; /* Làm cho hình nền cố định khi cuộn trang */
-    height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+    background-image: url('../assets/img/breadcrumb-bg.jpg');
+    background-size: cover;
+    background-position: center center; 
+    background-repeat: no-repeat; 
+    height: 100vh; 
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white; /* Màu chữ trắng để dễ đọc trên nền tối */
+    color: white; 
 }
 
 .hero-text h1 {
-    font-size: 3rem; /* Tùy chỉnh kích thước chữ */
+    font-size: 3rem; 
     font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Đổ bóng chữ để rõ ràng hơn */
-    margin: 0; /* Loại bỏ margin mặc định */
-    padding: 0; /* Loại bỏ padding mặc định */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); 
+    padding: 0; 
 }
 
 .hero-text-tablecell {
     display: inline-block;
-    vertical-align: middle; /* Giữ cho phần tử căn giữa theo chiều dọc */
+    vertical-align: middle;
 }
 
 @media (max-width: 768px) {
     .hero-text h1 {
-        font-size: 2rem; /* Giảm kích thước chữ trên màn hình nhỏ */
+        font-size: 2rem;
     }
 }
-/* Đảm bảo các cột đều nhau và hiển thị đúng trong layout */
+
 .row.product-lists {
     display: flex;
     flex-wrap: wrap;
@@ -136,12 +134,11 @@ $conn->close();
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
-    height: 100%; /* Đảm bảo các card có chiều cao bằng nhau */
+    height: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Tạo hiệu ứng hover */
 .single-product-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -166,7 +163,7 @@ h3 {
 
 .cart-btn {
     display: inline-block;
-    margin-top: auto; /* Đẩy nút 'Xem chi tiết' xuống dưới cùng của card */
+    margin-top: auto; 
     padding: 10px 20px;
     background-color: #007bff;
     color: #fff;
@@ -175,7 +172,7 @@ h3 {
     transition: background-color 0.3s ease;
 }
 
-/* Hover effect for cart button */
+
 .cart-btn:hover {
     background-color: #0056b3;
 }
@@ -187,7 +184,6 @@ h3 {
     <?php include '../component/product.card.php'; ?>
     <?php include '../component/footer.php'; ?>
     
-    <!-- Scripts -->
     <script src="../assets/js/jquery-1.11.3.min.js"></script>
     <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="../assets/js/main.js"></script>

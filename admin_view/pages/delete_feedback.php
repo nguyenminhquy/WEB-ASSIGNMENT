@@ -1,7 +1,5 @@
 <?php
 session_start();
-
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,12 +7,10 @@ $dbname = "food_web";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Kiểm tra và xóa bình luận
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_id'])) {
     $comment_id = intval($_POST['comment_id']);
@@ -29,8 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_id'])) {
     }
     $stmt->close();
 }
-
-// Truy vấn tất cả bình luận
 $sql = "SELECT c.id, c.comment_text, c.created_at, c.user_name, p.name AS product_name
         FROM comments c
         JOIN products p ON c.product_id = p.id
@@ -93,54 +87,78 @@ if (!$result) {
 
 <body>
 	<!-- header -->
-    <div class="top-header-area" id="sticker">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-sm-12 text-center">
-					<div class="main-menu-wrap">
-					                    <!-- logo -->
-										<div class="site-logo">
+<div class="top-header-area" id="sticker">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
     <a href="shop_user.php">
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
 
+                    <!-- logo -->
+                     <style>
+                        .site-logo img {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+}
 
+                     </style>
 
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li class="current-list-item"><a href="./index.php">TRANG CHỦ</a></li>
+                            <?php
+                            if (isset($_SESSION['username'])) {
+                                $username = $_SESSION['username'];
+                                echo '<li class="nav-item">
+                                        <a class="nav-link" href="./profile.php">
+                                            <i class="bi bi-person-circle"></i> ' . htmlspecialchars($username) . '
+                                        </a>
+                                      </li>';
+                                echo '<li><a href="logout.php">ĐĂNG XUẤT</a></li>';
+                            } else {
+                                echo '<li><a href="./login.php">ĐĂNG NHẬP</a></li>';
+                                echo '<li><a href="./register.php">ĐĂNG KÍ</a></li>';
+                            }
+                            ?>
 
+                            <li>
+                                <div class="header-icons">
+                                    <a class="shopping-cart" href="./cart.php"><i class="fas fa-shopping-cart"></i></a>
+                                    <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                    <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                    <div class="mobile-menu"></div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end header -->
+<?php
 
+$session_timeout = 10 * 60;  
 
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_unset(); 
+    session_destroy(); 
+    header("Location: login.php");  
+    exit();
+}
 
-						<!-- menu start -->
-						<nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-								
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
-						<!-- menu end -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end header -->
-
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
+$_SESSION['last_activity'] = time();
+?>
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -148,7 +166,6 @@ if (!$result) {
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -167,7 +184,6 @@ if (!$result) {
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -193,8 +209,6 @@ if (!$result) {
 
        <div class="container mt-5">
       <h1 class="text-center mb-4">Danh Sách Bình Luận</h1>
-
-       <!-- Hiển thị danh sách bình luận -->
         <?php if ($result->num_rows > 0): ?>
         <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -234,7 +248,6 @@ if (!$result) {
     </div>
 </div>
 
-<!-- Modal thông báo -->
 <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -267,6 +280,5 @@ if (!$result) {
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>

@@ -1,25 +1,19 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";  
+$password = "";      
+$dbname = "food_web"; 
 
-// Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Biến lưu thông báo
 $alert_message = "";
 
-// Kiểm tra nếu form đã được gửi
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $price = $_POST['price'];
@@ -27,31 +21,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $remain_product = $_POST['remain_product'];
     $image_url = "";
 
-    // Xử lý hình ảnh upload
     if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
         $image_url = "../../assets/img/" . basename($_FILES["image_url"]["name"]);
         move_uploaded_file($_FILES["image_url"]["tmp_name"], $image_url);
     }
 
-    // Kiểm tra các trường không để trống
     if (empty($name) || empty($price) || empty($description) || empty($remain_product)) {
         $alert_message = "Vui lòng điền đầy đủ thông tin.";
     } else {
-        // Câu truy vấn SQL
         $sql = "INSERT INTO products (name, price, description, remain_product, image_url) VALUES (?, ?, ?, ?, ?)";
 
-        // Chuẩn bị câu truy vấn
         $stmt = $conn->prepare($sql);
 
-        // Kiểm tra xem $stmt có phải là đối tượng mysqli_stmt không
         if ($stmt === false) {
-            die('Error in prepare statement: ' . $conn->error); // In ra lỗi nếu chuẩn bị câu truy vấn không thành công
+            die('Error in prepare statement: ' . $conn->error); 
         }
 
-        // Gắn tham số vào câu truy vấn
         $stmt->bind_param('sdsss', $name, $price, $description, $remain_product, $image_url);
 
-        // Thực thi câu truy vấn
         if ($stmt->execute()) {
             $alert_message = "Sản phẩm đã được thêm thành công!";
         } else {
@@ -117,53 +104,74 @@ $conn->close();
 
 	<!-- header -->
 <div class="top-header-area" id="sticker">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-sm-12 text-center">
-					<div class="main-menu-wrap">
-					                    <!-- logo -->
-										<div class="site-logo">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
     <a href="shop_user.php">
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
+    <style>    
+    .site-logo img {
+        width: 100px; 
+        height: 100px; 
+        border-radius: 50%; 
+        object-fit: cover; 
+    }
+    </style>
 
+                    <nav class="main-menu">
+                        <ul>
+                            <li class="current-list-item"><a href="./index.php">TRANG CHỦ</a></li>
+                          
 
+                            <?php
+                            if (isset($_SESSION['username'])) {
+                                $username = $_SESSION['username'];
+                                echo '<li class="nav-item">
+                                        <a class="nav-link" href="./profile.php">
+                                            <i class="bi bi-person-circle"></i> ' . htmlspecialchars($username) . '
+                                        </a>
+                                      </li>';
+                                echo '<li><a href="logout.php">ĐĂNG XUẤT</a></li>';
+                            } else {
+                                echo '<li><a href="./login.php">ĐĂNG NHẬP</a></li>';
+                                echo '<li><a href="./register.php">ĐĂNG KÍ</a></li>';
+                            }
+                            ?>
 
+                            <li>
+                                <div class="header-icons">
+                                    <a class="shopping-cart" href="./cart.php"><i class="fas fa-shopping-cart"></i></a>
+                                    <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                    <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                    <div class="mobile-menu"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php
 
+$session_timeout = 10 * 60;  
 
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_unset(); 
+    session_destroy(); 
+    header("Location: login.php");  
+    exit();
+}
 
+$_SESSION['last_activity'] = time();
+?>
 
-						<!-- menu start -->
-						<nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-								
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
-						<!-- menu end -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end header -->
-
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -171,13 +179,9 @@ $conn->close();
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
-                            
                         <?php else: ?>
-                            
-                            
                         <?php endif; ?>
                     </div>
                 </div>
@@ -190,7 +194,6 @@ $conn->close();
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -215,7 +218,6 @@ $conn->close();
                 <div class="container2 my-5">
     <h2 class="text-center">THÊM SẢN PHẨM MỚI CHO CỬA HÀNG</h2>
 
-    <!-- Hiển thị thông báo -->
     <?php if (!empty($alert_message)): ?>
         <div class="alert alert-info">
             <?php echo $alert_message; ?>
@@ -275,4 +277,3 @@ $conn->close();
 </body>
 
 </html>
-

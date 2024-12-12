@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kiểm tra nếu người dùng đã đăng nhập
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -9,7 +8,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -21,7 +19,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Lấy thông tin người dùng (bao gồm cả số điện thoại)
 $sql_user = "SELECT username, email, address, phone FROM users WHERE id = ?";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param('i', $user_id);
@@ -29,7 +26,6 @@ $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 $user_info = $result_user->fetch_assoc();
 
-// Lấy giỏ hàng của người dùng
 $sql_cart = "SELECT p.name, p.price, c.quantity, (p.price * c.quantity) AS total_price 
         FROM cart c
         JOIN products p ON c.product_id = p.id
@@ -39,7 +35,6 @@ $stmt_cart->bind_param('i', $user_id);
 $stmt_cart->execute();
 $result_cart = $stmt_cart->get_result();
 
-// Tính tổng tiền giỏ hàng
 $total_cart_value = 0;
 $cart_items = [];
 
@@ -73,13 +68,10 @@ $stmt_cart->close();
     <div class="container my-5">
     <h2 class="text-center mb-4">Thanh Toán</h2>
 
-    <!-- Thông báo lỗi -->
     <div id="error_message" class="alert alert-danger fade show" role="alert"></div>
 
-    <!-- Thông tin người dùng -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <!-- Card Information -->
             <div class="card shadow-sm border-light">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">Thông tin người dùng</h4>
@@ -115,7 +107,6 @@ $stmt_cart->close();
         </div>
     </div>
 
-    <!-- Thông tin giỏ hàng -->
     <div class="row mb-4">
         <div class="col-md-12">
         <div class="card-header bg-primary text-white">
@@ -147,7 +138,6 @@ $stmt_cart->close();
         </div>
     </div>
 
-    <!-- Phương thức thanh toán -->
     <div class="row mb-4">
         
         <div class="col-md-12">
@@ -166,7 +156,6 @@ $stmt_cart->close();
                     </select>
                 </div>
 
-                <!-- Ngân hàng -->
                 <div class="form-group mb-4" id="bank_selection" style="display:none;">
                     <label for="bank" class="h5">Chọn Ngân Hàng:</label>
                     <select class="form-control form-control-lg" id="bank" name="bank" required>
@@ -198,19 +187,16 @@ $stmt_cart->close();
 
     <script>
         document.getElementById('payment_form').addEventListener('submit', function(event) {
-            // Kiểm tra nếu giỏ hàng trống
             if (<?= $total_cart_value ?> === 0) {
                 var errorMessage = document.getElementById('error_message');
                 errorMessage.textContent = "Giỏ hàng của bạn hiện tại không có sản phẩm. Vui lòng thêm sản phẩm vào giỏ hàng.";
-                errorMessage.style.display = 'block'; // Hiển thị thông báo
+                errorMessage.style.display = 'block'; 
 
-                // Ngừng gửi form
                 event.preventDefault();
 
-                // Ẩn thông báo sau 5 giây
                 setTimeout(function() {
                     errorMessage.style.display = 'none';
-                }, 5000); // 5000ms = 5 giây
+                }, 5000); 
             }
         });
         document.getElementById('payment_method').addEventListener('change', function() {
@@ -223,8 +209,6 @@ $stmt_cart->close();
         bankSelection.style.display = 'none';
     }
 });
-
-
         document.getElementById('payment_method').addEventListener('change', function() {
             var paymentMethod = this.value;
             var bankSelection = document.getElementById('bank_selection');
@@ -241,5 +225,5 @@ $stmt_cart->close();
 </html>
 
 <?php
-// Đóng kết nối
 $conn->close();
+?>

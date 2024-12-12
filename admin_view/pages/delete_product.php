@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// Kiểm tra nếu người dùng chưa đăng nhập
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -19,7 +17,6 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Xóa sản phẩm nếu người dùng nhấn nút xóa
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product_id'])) {
     $product_id = intval($_POST['delete_product_id']);
     $sql_delete = "DELETE FROM products WHERE id = ?";
@@ -33,30 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product_id']))
     $stmt->close();
 }
 
-// Truy vấn tất cả sản phẩm
 $sql = "SELECT * FROM products";
 $result = $conn->query($sql);
-
-$items_per_page = 3;
-
-// Xác định trang hiện tại (nếu không có thì mặc định là 1)
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$current_page = max(1, $current_page); // Không cho phép giá trị nhỏ hơn 1
-
-// Tính OFFSET
-$offset = ($current_page - 1) * $items_per_page;
-
-// Lấy tổng số sản phẩm
-$sql_count = "SELECT COUNT(*) AS total FROM products";
-$result_count = $conn->query($sql_count);
-$total_items = $result_count->fetch_assoc()['total'];
-
-// Tính tổng số trang
-$total_pages = ceil($total_items / $items_per_page);
-
-// Lấy danh sách sản phẩm cho trang hiện tại
-$sql_products = "SELECT * FROM products LIMIT $items_per_page OFFSET $offset";
-$result_pagination = $conn->query($sql_products);
 ?>
 
 <!DOCTYPE html>
@@ -110,6 +85,7 @@ $result_pagination = $conn->query($sql_products);
 
 
 <body>
+    
 <div class="top-header-area" id="sticker">
 		<div class="container">
 			<div class="row">
@@ -121,13 +97,6 @@ $result_pagination = $conn->query($sql_products);
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
-
-
-
-
-
-
-
 						<!-- menu start -->
 						<nav class="main-menu">
 							<ul>
@@ -155,9 +124,6 @@ $result_pagination = $conn->query($sql_products);
 	</div>
 	<!-- end header -->
 
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -165,7 +131,6 @@ $result_pagination = $conn->query($sql_products);
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -184,7 +149,6 @@ $result_pagination = $conn->query($sql_products);
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -228,56 +192,31 @@ $result_pagination = $conn->query($sql_products);
         </div>
     <?php endif; ?>
 
-    <div class="product-list">
-    <div class="row">
-        <?php if ($result_pagination->num_rows > 0): ?>
-            <?php while ($product = $result_pagination->fetch_assoc()): ?>
-                <div class="col-md-4">
-                    <div class="product-card">
-                        <img class="product-image" src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                        <div class="product-info">
-                            <h5><?php echo htmlspecialchars($product['name']); ?></h5>
-                            <p>Giá: <?php echo number_format($product['price'], 2); ?> VND</p>
-                            <a href="delete_product.php?id=<?php echo $product['id']; ?>" class="btn btn-danger btn-sm">Xóa</a>
+    <div class="row" id="product-list">
+        <?php if ($result->num_rows > 0): ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card product-card">
+                        <img src="<?= htmlspecialchars($row['image_url']); ?>" class="card-img-top" alt="<?= htmlspecialchars($row['name']); ?>">
+                        <div class="card-body">
+                            <h5 class="card-title"><?= htmlspecialchars($row['name']); ?></h5>
+                            <p class="card-text">Giá: <?= number_format($row['price'], 0, ',', '.'); ?> VND</p>
+                            <p class="card-text product-description"><?= htmlspecialchars($row['description']); ?></p>
+                            <p class="text-muted">Ngày tạo: <?= htmlspecialchars($row['created_at']); ?></p>
+                            <form action="" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                                <input type="hidden" name="delete_product_id" value="<?= $row['id']; ?>">
+                                <button type="submit" class="btn btn-danger">Xóa</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <p>Không có sản phẩm nào để hiển thị.</p>
+            <p class="text-center">Không có sản phẩm nào.</p>
         <?php endif; ?>
     </div>
 </div>
-
-<nav aria-label="Pagination">
-    <ul class="pagination justify-content-center">
-        <?php if ($current_page > 1): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?php echo $current_page - 1; ?>">← Trang trước</a>
-            </li>
-        <?php else: ?>
-            <li class="page-item disabled">
-                <span class="page-link">← Trang trước</span>
-            </li>
-        <?php endif; ?>
-
-        <?php for ($page = 1; $page <= $total_pages; $page++): ?>
-            <li class="page-item <?php echo ($page == $current_page) ? 'active' : ''; ?>">
-                <a class="page-link" href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
-            </li>
-        <?php endfor; ?>
-
-        <?php if ($current_page < $total_pages): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?php echo $current_page + 1; ?>">Trang sau →</a>
-            </li>
-        <?php else: ?>
-            <li class="page-item disabled">
-                <span class="page-link">Trang sau →</span>
-            </li>
-        <?php endif; ?>
-    </ul>
-</nav>
+                </div>
 
 </div>
 </div>
@@ -293,6 +232,5 @@ $result_pagination = $conn->query($sql_products);
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>

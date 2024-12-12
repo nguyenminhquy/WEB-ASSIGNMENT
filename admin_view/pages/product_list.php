@@ -1,44 +1,20 @@
 <?php
-// Bắt đầu phiên làm việc (session)
 session_start();
 
-// Kết nối cơ sở dữ liệu
 $servername = "localhost";
-$username = "root";  // Thay đổi nếu cần
-$password = "";      // Thay đổi nếu cần
-$dbname = "food_web"; // Thay đổi tên cơ sở dữ liệu của bạn
+$username = "root";  
+$password = "";     
+$dbname = "food_web"; 
 
-// Tạo kết nối
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Truy vấn tất cả sản phẩm
 $sql = "SELECT * FROM products";
 $result = $conn->query($sql);
-
-$products_per_page = 3;
-
-// Xác định trang hiện tại từ URL (nếu không có thì mặc định là trang 1)
-$current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-
-// Xác định tổng số sản phẩm
-$sql_count = "SELECT COUNT(*) AS total_products FROM products";
-$result_count = $conn->query($sql_count);
-$total_products = ($result_count->num_rows > 0) ? $result_count->fetch_assoc()['total_products'] : 0;
-
-// Tính số trang
-$total_pages = ceil($total_products / $products_per_page);
-
-// Xác định sản phẩm bắt đầu cho trang hiện tại
-$offset = ($current_page - 1) * $products_per_page;
-
-// Truy vấn sản phẩm cho trang hiện tại
-$sql_pagination = "SELECT * FROM products LIMIT $products_per_page OFFSET $offset";
-$result_pagination = $conn->query($sql_pagination);
 ?>
 
 
@@ -95,53 +71,79 @@ $result_pagination = $conn->query($sql_pagination);
 
 	<!-- header -->
 <div class="top-header-area" id="sticker">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-sm-12 text-center">
-					<div class="main-menu-wrap">
-					                    <!-- logo -->
-										<div class="site-logo">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
     <a href="shop_user.php">
         <img src="../../user_view/assets/img/logo.jpg" alt="Logo">
     </a>
 </div>
 
+                    <!-- logo -->
+                     <style>
+                        .site-logo img {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+}
 
+                     </style>
 
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li class="current-list-item"><a href="./index.php">TRANG CHỦ</a></li>
+                          
+                            <?php
+                            if (isset($_SESSION['username'])) {
+                                $username = $_SESSION['username'];
+                                echo '<li class="nav-item">
+                                        <a class="nav-link" href="./profile.php">
+                                            <i class="bi bi-person-circle"></i> ' . htmlspecialchars($username) . '
+                                        </a>
+                                      </li>';
+                                echo '<li><a href="logout.php">ĐĂNG XUẤT</a></li>';
+                            } else {
+                                echo '<li><a href="./login.php">ĐĂNG NHẬP</a></li>';
+                                echo '<li><a href="./register.php">ĐĂNG KÍ</a></li>';
+                            }
+                            ?>
 
+                            <li>
+                                <div class="header-icons">
+                                    <a class="shopping-cart" href="./cart.php"><i class="fas fa-shopping-cart"></i></a>
+                                    <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                    <a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+                    <div class="mobile-menu"></div>
+                    <!-- menu end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end header -->
+<?php
 
+$session_timeout = 10 * 60;  
 
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_timeout) {
+    session_unset(); 
+    session_destroy(); 
+    header("Location: login.php");  
+    exit();
+}
 
-						<!-- menu start -->
-						<nav class="main-menu">
-							<ul>
-								<li class="current-list-item"><a href="./index.php">TRANG CHỦ </a></li>
-								<li><a href="./user_view/pages/login.php">GIỚI THIỆU </a></li>
-                                <li><a href="about.php">THÔNG TIN LIÊN HỆ  </a></li>
-                                <li><a href="../user_view/pages/login.php">ĐĂNG NHẬP   </a></li>
-                                <li><a href="../user_view/pages/register.php">ĐĂNG KÍ   </a></li>
-								
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="./user_view/pages/login.php"><i class="fas fa-shopping-cart"></i></a>
-										<a class="mobile-hide search-bar-icon" href="./user_view/pages/login.php"><i class="fas fa-search"></i></a>
-									</div>
-								</li>
-							</ul>
-						</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-						<div class="mobile-menu"></div>
-						<!-- menu end -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end header -->
+$_SESSION['last_activity'] = time();
+?>
 
-
-<!-- HERO AREA  CHỈ CẦN COPY VO TỪNG TRANG LÀ DC -->
- <!-- hero area -->
 <div class="hero-area hero-bg">
     <div class="container">
         <div class="row">
@@ -149,7 +151,6 @@ $result_pagination = $conn->query($sql_pagination);
                 <div class="hero-text">
                     <div class="hero-text-tablecell">
                         <p class="subtitle">CHÀO MỪNG ADMIN</p>
-                        <!-- Kiểm tra nếu người dùng đã đăng nhập và hiển thị tên người dùng -->
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <h1>Chào mừng, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
                             
@@ -168,7 +169,6 @@ $result_pagination = $conn->query($sql_pagination);
         <div class="row">
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Đóng tất cả các mục khác khi một mục được mở
         const collapses = document.querySelectorAll('.collapse');
         collapses.forEach(collapse => {
             collapse.addEventListener('show.bs.collapse', () => {
@@ -196,69 +196,39 @@ $result_pagination = $conn->query($sql_pagination);
                    
                 <div class="container-fluid">
     <h2 class="text-center my-4">Danh Sách Sản Phẩm</h2>
+    
+    <div class="row">
+    <?php
+// Kiểm tra nếu có sản phẩm
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        // Kiểm tra số lượng sản phẩm còn lại
+        $remain_product = $row['remain_product'];
+        $availability_class = ($remain_product > 0) ? 'available' : 'out-of-stock';
+        $availability_text = ($remain_product > 0) ? 'Còn hàng' : 'Hết hàng';
 
-    <div class="row product-list">
-    <?php if ($result_pagination->num_rows > 0): ?>
-        <?php while ($product = $result_pagination->fetch_assoc()): ?>
-            <div class="col-md-4">
-                <div class="product-card">
-                    <img class="product-image" src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                    <div class="product-info">
-                        <h5><?php echo htmlspecialchars($product['name']); ?></h5>
-                        <p>Giá: <?php echo number_format($product['price'], 2); ?> VND</p>
-                        <p>Mô tả: <?php echo htmlspecialchars($product['description']); ?></p>
-                        <p><strong>Ngày tạo: </strong><?php echo htmlspecialchars($product['created_at']); ?></p>
-                        <?php
-                        $remain_product = $product['remain_product'];
-                        $availability_class = ($remain_product > 0) ? 'available' : 'out-of-stock';
-                        $availability_text = ($remain_product > 0) ? 'Còn hàng' : 'Hết hàng';
-                        ?>
-                        <p class="<?php echo $availability_class; ?>"><?php echo $availability_text; ?></p>
-                        <a href="edit_product.php?id=<?php echo $product['id']; ?>" class="btn btn-warning btn-sm">Chỉnh sửa</a>
-                        <a href="delete_product.php?id=<?php echo $product['id']; ?>" class="btn btn-danger btn-sm">Xóa</a>
+        echo "<div class='col-md-4'>
+                <div class='product-card'>
+                    <img class='product-image' src='" . $row['image_url'] . "' alt='" . $row['name'] . "'>
+                    <div class='product-info'>
+                        <h5>" . $row['name'] . "</h5>
+                        <p>Giá: " . number_format($row['price'], 2) . " VND</p>
+                        <p>Mô tả: " . $row['description'] . "</p>
+                        <p><strong>Ngày tạo: </strong>" . $row['created_at'] . "</p>
+                        <p class='$availability_class'>$availability_text</p>
+                        <a href='edit_product.php?id=" . $row['id'] . "' class='btn btn-warning btn-sm'>Chỉnh sửa</a>
+                        <a href='delete_product.php?id=" . $row['id'] . "' class='btn btn-danger btn-sm'>Xóa</a>
                     </div>
                 </div>
-            </div>
-        <?php endwhile; ?>
-    <?php else: ?>
-        <p>Không có sản phẩm nào để hiển thị.</p>
-    <?php endif; ?>
-</div>
+            </div>";
+    }
+} else {
+    echo "<p>Không có sản phẩm nào.</p>";
+}
+?>
 
-<nav aria-label="Pagination">
-    <ul class="pagination justify-content-center">
-        <!-- Trang trước -->
-        <?php if ($current_page > 1): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?php echo $current_page - 1; ?>">← Trang trước</a>
-            </li>
-        <?php else: ?>
-            <li class="page-item disabled">
-                <span class="page-link">← Trang trước</span>
-            </li>
-        <?php endif; ?>
-
-        <!-- Các trang -->
-        <?php for ($page = 1; $page <= $total_pages; $page++): ?>
-            <li class="page-item <?php if ($page == $current_page) echo 'active'; ?>">
-                <a class="page-link" href="?page=<?php echo $page; ?>">
-                    <?php echo $page; ?>
-                </a>
-            </li>
-        <?php endfor; ?>
-
-        <!-- Trang sau -->
-        <?php if ($current_page < $total_pages): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?php echo $current_page + 1; ?>">Trang sau →</a>
-            </li>
-        <?php else: ?>
-            <li class="page-item disabled">
-                <span class="page-link">Trang sau →</span>
-            </li>
-        <?php endif; ?>
-    </ul>
-</nav>
+    </div>
+</div> 
                    
                 </div>
 
@@ -275,6 +245,5 @@ $result_pagination = $conn->query($sql_pagination);
 </html>
 
 <?php
-// Đóng kết nối cơ sở dữ liệu
 $conn->close();
 ?>
